@@ -40,14 +40,14 @@
                             Override
                         </a>
 
-                        <a href="{{ route('academic_events.index') }}"
+                        <a href="{{ route('academic_events.create') }}"
                            class="text-white/90 hover:text-yellow-300 transition text-sm">
                             Academic Events
                         </a>
                     @endif
 
-                    @if(Auth::user()->role === 'teacher' || Auth::user()->role === 'faculty')
-                        <a href="/staff/viewer"
+                    @if(Auth::user()->role === 'professor' || Auth::user()->role === 'faculty')
+                        <a href="{{ route('staff.viewer') }}"
                            class="text-white/90 hover:text-yellow-300 transition text-sm">
                             Staff Viewer
                         </a>
@@ -100,11 +100,11 @@
             <a href="{{ route('admin.users.create') }}" class="block text-white">Create Account</a>
             <a href="/admin/viewer" class="block text-white">Viewer</a>
             <a href="/admin/status" class="block text-white">Override</a>
-            <a href="{{ route('academic_events.index') }}" class="block text-white">Academic Events</a>
+            <a href="{{ route('academic_events.create') }}" class="block text-white">Academic Events</a>
         @endif
 
-        @if(Auth::user()->role === 'teacher' || Auth::user()->role === 'faculty')
-            <a href="/staff/viewer" class="block text-white">Staff Viewer</a>
+        @if(Auth::user()->role === 'professor' || Auth::user()->role === 'faculty')
+            <a href="{{ route('staff.viewer') }}" class="block text-white">Staff Viewer</a>
         @endif
 
         @if(Auth::user()->role === 'student')

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AttendanceRecord;
 use App\Models\Schedule;
 use App\Models\SpecialSchedule;
 use App\Models\User;
@@ -20,16 +21,17 @@ class LiveStatusTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_teacher_returns_to_in_class_when_special_schedule_has_no_class_carry(): void
+    public function test_professor_returns_to_in_class_when_special_schedule_has_no_class_carry(): void
     {
         Carbon::setTestNow('2026-04-18 13:45:00');
 
-        $teacher = User::factory()->create([
-            'role' => 'teacher',
+        $professor = User::factory()->create([
+            'role' => 'professor',
         ]);
+        $this->timeIn($professor);
 
         Schedule::create([
-            'user_id' => $teacher->id,
+            'user_id' => $professor->id,
             'subject' => 'Physics',
             'room' => 'Room 204',
             'day_of_week' => Carbon::now()->format('l'),
@@ -40,7 +42,7 @@ class LiveStatusTest extends TestCase
         ]);
 
         SpecialSchedule::create([
-            'user_id' => $teacher->id,
+            'user_id' => $professor->id,
             'type' => 'On Meeting',
             'start_datetime' => '2026-04-18 13:00:00',
             'end_datetime' => '2026-04-18 13:30:00',
@@ -48,7 +50,7 @@ class LiveStatusTest extends TestCase
             'keep_until_schedule_end' => false,
         ]);
 
-        $status = $teacher->fresh()->live_status;
+        $status = $professor->fresh()->live_status;
 
         $this->assertSame('In Class', $status['status']);
         $this->assertSame('weekly_schedule', $status['source']);
@@ -63,12 +65,13 @@ class LiveStatusTest extends TestCase
     {
         Carbon::setTestNow('2026-04-18 13:15:00');
 
-        $teacher = User::factory()->create([
-            'role' => 'teacher',
+        $professor = User::factory()->create([
+            'role' => 'professor',
         ]);
+        $this->timeIn($professor);
 
         SpecialSchedule::create([
-            'user_id' => $teacher->id,
+            'user_id' => $professor->id,
             'type' => 'On Meeting',
             'start_datetime' => '2026-04-18 13:00:00',
             'end_datetime' => '2026-04-18 13:30:00',
@@ -76,7 +79,7 @@ class LiveStatusTest extends TestCase
             'keep_until_schedule_end' => false,
         ]);
 
-        $status = $teacher->fresh()->live_status;
+        $status = $professor->fresh()->live_status;
 
         $this->assertSame('On Meeting', $status['status']);
         $this->assertSame('special_schedule', $status['source']);
@@ -90,12 +93,13 @@ class LiveStatusTest extends TestCase
     {
         Carbon::setTestNow('2026-04-18 13:15:00');
 
-        $teacher = User::factory()->create([
-            'role' => 'teacher',
+        $professor = User::factory()->create([
+            'role' => 'professor',
         ]);
+        $this->timeIn($professor);
 
         Schedule::create([
-            'user_id' => $teacher->id,
+            'user_id' => $professor->id,
             'subject' => 'Physics',
             'room' => 'Room 204',
             'day_of_week' => Carbon::now()->format('l'),
@@ -106,7 +110,7 @@ class LiveStatusTest extends TestCase
         ]);
 
         SpecialSchedule::create([
-            'user_id' => $teacher->id,
+            'user_id' => $professor->id,
             'type' => 'On Meeting',
             'start_datetime' => '2026-04-18 13:00:00',
             'end_datetime' => '2026-04-18 13:30:00',
@@ -114,7 +118,7 @@ class LiveStatusTest extends TestCase
             'keep_until_schedule_end' => true,
         ]);
 
-        $status = $teacher->fresh()->live_status;
+        $status = $professor->fresh()->live_status;
 
         $this->assertSame('On Meeting', $status['status']);
         $this->assertSame('special_schedule', $status['source']);
@@ -124,16 +128,17 @@ class LiveStatusTest extends TestCase
         $this->assertSame('14:00:00', $status['class_end_time']);
     }
 
-    public function test_teacher_keeps_special_status_for_the_rest_of_the_current_class_when_enabled(): void
+    public function test_professor_keeps_special_status_for_the_rest_of_the_current_class_when_enabled(): void
     {
         Carbon::setTestNow('2026-04-18 13:45:00');
 
-        $teacher = User::factory()->create([
-            'role' => 'teacher',
+        $professor = User::factory()->create([
+            'role' => 'professor',
         ]);
+        $this->timeIn($professor);
 
         Schedule::create([
-            'user_id' => $teacher->id,
+            'user_id' => $professor->id,
             'subject' => 'Physics',
             'room' => 'Room 204',
             'day_of_week' => Carbon::now()->format('l'),
@@ -144,7 +149,7 @@ class LiveStatusTest extends TestCase
         ]);
 
         SpecialSchedule::create([
-            'user_id' => $teacher->id,
+            'user_id' => $professor->id,
             'type' => 'On Meeting',
             'start_datetime' => '2026-04-18 13:00:00',
             'end_datetime' => '2026-04-18 13:30:00',
@@ -152,7 +157,7 @@ class LiveStatusTest extends TestCase
             'keep_until_schedule_end' => true,
         ]);
 
-        $status = $teacher->fresh()->live_status;
+        $status = $professor->fresh()->live_status;
 
         $this->assertSame('On Meeting', $status['status']);
         $this->assertSame('special_schedule_extended', $status['source']);
@@ -162,5 +167,13 @@ class LiveStatusTest extends TestCase
         $this->assertSame('2026-04-18 14:00:00', $status['status_end_datetime']);
         $this->assertSame('13:00:00', $status['class_start_time']);
         $this->assertSame('14:00:00', $status['class_end_time']);
+    }
+
+    private function timeIn(User $user): void
+    {
+        AttendanceRecord::create([
+            'user_id' => $user->id,
+            'time_in' => Carbon::now()->subHour(),
+        ]);
     }
 }

@@ -14,7 +14,13 @@ class RoleMiddleware
             return redirect('/login');
         }
 
-        if (!in_array(auth()->user()->role, $roles)) {
+        $allowedRoles = collect($roles)
+            ->flatMap(fn (string $role) => explode('|', $role))
+            ->map(fn (string $role) => trim($role))
+            ->filter()
+            ->all();
+
+        if (!in_array(auth()->user()->role, $allowedRoles, true)) {
             abort(403, 'Unauthorized');
         }
 

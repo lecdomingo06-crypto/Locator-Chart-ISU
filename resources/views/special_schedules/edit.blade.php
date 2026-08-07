@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+    <title>{{ config('app.name', 'Professor Tracker') }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
@@ -548,6 +548,7 @@
             }
         }
     </style>
+    <x-minimal-ui />
 </head>
 <body>
     <div class="page">
@@ -556,7 +557,7 @@
                 <div class="brand">
                     <div class="brand-mark" aria-hidden="true"></div>
                     <div class="brand-copy">
-                        <strong>Teacher Tracking System</strong>
+                        <strong>Professor Tracking System</strong>
                         <span>Special schedule manager</span>
                     </div>
                 </div>
@@ -632,7 +633,7 @@
                                     @enderror
                                 </div>
 
-                                @if(auth()->user()->role === 'teacher')
+                                @if(auth()->user()->role === 'professor')
                                     <div
                                         id="keep_until_schedule_end_field"
                                         class="field full"
@@ -688,10 +689,10 @@
                                 <strong>Refresh the reason when a meeting, absence, or emergency detail needs more context.</strong>
                             </div>
 
-                            @if(auth()->user()->role === 'teacher')
+                            @if(auth()->user()->role === 'professor')
                                 <div class="info-item">
                                     <span>Missed class</span>
-                                    <strong>Use the extra option when the teacher will also be absent for the remaining part of the current class period.</strong>
+                                    <strong>Use the extra option when the professor will also be absent for the remaining part of the current class period.</strong>
                                 </div>
                             @endif
                         </div>

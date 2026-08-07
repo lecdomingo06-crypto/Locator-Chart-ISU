@@ -2,13 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Department;
+use Illuminate\Database\Seeder;
 
 class DepartmentSeeder extends Seeder
 {
     public function run(): void
     {
+        Department::whereIn('name', ['DREPT', 'SMNHS'])->delete();
+
         $departments = [
             ['name' => 'CCSICT', 'map_label' => 'College of Computer Studies, Information and Communications Technology'],
             ['name' => 'CED', 'map_label' => 'College of Education'],
@@ -20,7 +22,10 @@ class DepartmentSeeder extends Seeder
         ];
 
         foreach ($departments as $department) {
-            Department::create($department);
+            Department::updateOrCreate(
+                ['name' => $department['name']],
+                ['map_label' => $department['map_label']]
+            );
         }
     }
 }

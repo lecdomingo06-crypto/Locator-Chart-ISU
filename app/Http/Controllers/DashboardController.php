@@ -14,9 +14,9 @@ class DashboardController extends Controller
         return view('dashboards.student');
     }
 
-    public function teacher()
+    public function professor()
     {
-        return view('dashboards.teacher');
+        return view('dashboards.professor');
     }
 
     public function faculty()

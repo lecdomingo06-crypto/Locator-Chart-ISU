@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+    <title>{{ config('app.name', 'Professor Tracker') }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
     <style>
@@ -84,6 +84,7 @@
         @media (max-width:860px) { .section-head { align-items:flex-start; flex-direction:column; } .section-meta { justify-content:flex-start; } }
         @media (max-width:720px) { .page { padding:18px; } .topbar { padding:16px 18px; border-radius:24px; flex-direction:column; align-items:flex-start; } .hero-card, .summary-card { padding:22px; border-radius:28px; } .hero-actions, .card-actions { flex-direction:column; align-items:stretch; } .primary-link, .secondary-link, .edit-link, .delete-button { width:100%; } .detail-grid, .summary-grid { grid-template-columns:1fr; } .event-head { flex-direction:column; align-items:flex-start; } }
     </style>
+    <x-minimal-ui />
 </head>
 <body>
 @php
@@ -93,7 +94,7 @@
         ['label' => 'Past Events', 'title' => 'Recently Finished', 'events' => $pastEvents, 'meta' => 'Completed event history', 'empty_title' => 'No past academic events yet.', 'empty_text' => 'Finished events will appear here after their end time passes.'],
     ];
     $typeStyles = ['Holiday' => 'background: linear-gradient(135deg, #b45309, #d97706);', 'Class Suspension' => 'background: linear-gradient(135deg, #b91c1c, #dc2626);', 'No Classes' => 'background: linear-gradient(135deg, #0f766e, #0891b2);', 'University Event' => 'background: linear-gradient(135deg, #1d4ed8, #2563eb);', 'Department Activity' => 'background: linear-gradient(135deg, #6d28d9, #7c3aed);'];
-    $scopeStyles = ['all' => 'background: linear-gradient(135deg, #147247, #0c5c38);', 'teachers' => 'background: linear-gradient(135deg, #0f766e, #147247);', 'faculty' => 'background: linear-gradient(135deg, #2563eb, #1d4ed8);', 'department' => 'background: linear-gradient(135deg, #7c3aed, #5b21b6);'];
+    $scopeStyles = ['all' => 'background: linear-gradient(135deg, #147247, #0c5c38);', 'professors' => 'background: linear-gradient(135deg, #0f766e, #147247);', 'faculty' => 'background: linear-gradient(135deg, #2563eb, #1d4ed8);', 'department' => 'background: linear-gradient(135deg, #7c3aed, #5b21b6);'];
 @endphp
     <div class="page">
         <div class="shell">
@@ -101,7 +102,7 @@
                 <div class="brand">
                     <div class="brand-mark" aria-hidden="true"></div>
                     <div class="brand-copy">
-                        <strong>Teacher Tracking System</strong>
+                        <strong>Professor Tracking System</strong>
                         <span>Global academic event manager</span>
                     </div>
                 </div>
@@ -113,9 +114,7 @@
                         <div class="eyebrow">Academic Events</div>
                         <h1>Global events that affect live status.</h1>
                         <p>Manage holidays, class suspensions, no-classes periods, university events, and scoped department activities from one clear admin page.</p>
-                        @if(session('success'))
-                            <div class="success-alert">{{ session('success') }}</div>
-                        @endif
+                        <x-flash-toast />
                         <div class="hero-actions">
                             <a href="{{ route('academic_events.create') }}" class="primary-link">Add Academic Event</a>
                             <a href="{{ route('admin.dashboard') }}" class="secondary-link">Back to Admin Dashboard</a>
@@ -166,6 +165,7 @@
                                     <div class="detail-card"><span>Scope</span><strong>{{ $event->scope_label }}</strong></div>
                                     <div class="detail-card"><span>Department</span><strong>{{ $event->department?->name ?? 'Not department-specific' }}</strong></div>
                                     <div class="detail-card full"><span>Note</span><strong>{{ $event->note ?: 'No note provided for this academic event.' }}</strong></div>
+                                    <div class="detail-card full"><span>Purpose</span><strong>{{ $event->purpose ?: 'No purpose provided for this academic event.' }}</strong></div>
                                 </div>
                                 <div class="card-actions">
                                     <a href="{{ route('academic_events.edit', $event) }}" class="edit-link">Edit</a>

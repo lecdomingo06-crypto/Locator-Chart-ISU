@@ -18,7 +18,7 @@
                 <div style="display: grid; gap: 8px;">
                     <strong style="font-size: 1.05rem; letter-spacing: -0.02em;">Protected session confirmation</strong>
                     <span style="color: rgba(238, 252, 242, 0.8); line-height: 1.7;">
-                        Confirming your password helps keep sensitive account actions and private sections of the teacher tracking system secure.
+                        Confirming your password helps keep sensitive account actions and private sections of the professor tracking system secure.
                     </span>
                 </div>
             </div>

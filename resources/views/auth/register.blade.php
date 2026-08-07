@@ -1,96 +1,94 @@
-<x-guest-layout>
-    <div class="auth-stack">
-        <div class="auth-heading">
-            <div class="auth-eyebrow">Admin Access</div>
-            <h1 class="auth-title">Create a new account</h1>
-            <p class="auth-copy">Provision student, teacher, and faculty access without leaving the familiar registration form.</p>
-        </div>
+@extends('layouts.admin-users')
 
-        <x-auth-session-status class="auth-status" :status="session('status')" />
+@section('title', 'Create Account')
 
-        <form method="POST" action="{{ route('admin.users.store') }}" class="auth-form-grid">
-            @csrf
+@section('content')
+<section class="page-head">
+    <div class="page-title">
+        <span>Admin Access</span>
+        <h1>Create Account</h1>
+    </div>
+    <div class="page-meta">Professor and faculty only</div>
+</section>
 
-            <div class="auth-group">
-                <x-input-label for="full_name" :value="__('Full Name')" class="auth-label" />
-                <x-text-input id="full_name"
-                    class="auth-field"
-                    type="text"
-                    name="full_name"
-                    :value="old('full_name')"
-                    required
-                    autofocus />
-                <x-input-error :messages="$errors->get('full_name')" class="auth-error" />
-            </div>
-
-            <div class="auth-group">
-                <x-input-label for="username" :value="__('Username')" class="auth-label" />
-                <x-text-input id="username"
-                    class="auth-field"
-                    type="text"
-                    name="username"
-                    :value="old('username')"
-                    required />
-                <x-input-error :messages="$errors->get('username')" class="auth-error" />
-            </div>
-
-            <div class="auth-group">
-                <x-input-label for="role" :value="__('Role')" class="auth-label" />
-                <select id="role" name="role"
-                    class="auth-field auth-select"
-                    required>
-                    <option value="">Select Role</option>
-                    <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
-                    <option value="teacher" {{ old('role') == 'teacher' ? 'selected' : '' }}>Teacher</option>
-                    <option value="faculty" {{ old('role') == 'faculty' ? 'selected' : '' }}>Faculty</option>
-                </select>
-                <x-input-error :messages="$errors->get('role')" class="auth-error" />
-            </div>
-
-            <div class="auth-group">
-                <x-input-label for="department_id" :value="__('Department')" class="auth-label" />
-                <select id="department_id" name="department_id"
-                    class="auth-field auth-select">
-                    <option value="">Select Department</option>
-                    @foreach($departments as $department)
-                        <option value="{{ $department->id }}" {{ old('department_id') == $department->id ? 'selected' : '' }}>
-                            {{ $department->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <x-input-error :messages="$errors->get('department_id')" class="auth-error" />
-            </div>
-
-            <div class="auth-group">
-                <x-input-label for="password" :value="__('Password')" class="auth-label" />
-                <x-text-input id="password"
-                    class="auth-field"
-                    type="password"
-                    name="password"
-                    required
-                    autocomplete="new-password" />
-                <x-input-error :messages="$errors->get('password')" class="auth-error" />
-            </div>
-
-            <div class="auth-group">
-                <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="auth-label" />
-                <x-text-input id="password_confirmation"
-                    class="auth-field"
-                    type="password"
-                    name="password_confirmation"
-                    required
-                    autocomplete="new-password" />
-                <x-input-error :messages="$errors->get('password_confirmation')" class="auth-error" />
-            </div>
-
-            <button type="submit" class="auth-button">
-                {{ __('Create Account') }}
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            <span>Finished creating accounts?</span>
-            <a href="{{ route('admin.dashboard') }}" class="auth-inline-link">Back to dashboard</a>
+<section class="detail-panel">
+    <div class="panel-head">
+        <div>
+            <span class="panel-kicker">Account Details</span>
+            <h2>Provision a workspace account</h2>
         </div>
     </div>
-</x-guest-layout>
+
+    <div class="panel-body">
+        <form method="POST" action="{{ route('admin.users.store') }}">
+            @csrf
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="full_name">Full Name</label>
+                    <input id="full_name" type="text" name="full_name" value="{{ old('full_name') }}" required autofocus>
+                    @error('full_name')
+                        <p class="field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="field">
+                    <label for="username">Username</label>
+                    <input id="username" type="text" name="username" value="{{ old('username') }}" required>
+                    @error('username')
+                        <p class="field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="field">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="professor" @selected(old('role') === 'professor')>Professor</option>
+                        <option value="faculty" @selected(old('role') === 'faculty')>Faculty</option>
+                    </select>
+                    @error('role')
+                        <p class="field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="field">
+                    <label for="department_id">Department</label>
+                    <select id="department_id" name="department_id">
+                        <option value="">Select Department</option>
+                        @foreach($departments as $department)
+                            <option value="{{ $department->id }}" @selected((string) old('department_id') === (string) $department->id)>
+                                {{ $department->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('department_id')
+                        <p class="field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password" required autocomplete="new-password">
+                    @error('password')
+                        <p class="field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="field">
+                    <label for="password_confirmation">Confirm Password</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
+                    @error('password_confirmation')
+                        <p class="field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ route('admin.viewer') }}" class="secondary-button">Cancel</a>
+                <button type="submit" class="primary-button">Create Account</button>
+            </div>
+        </form>
+    </div>
+</section>
+@endsection

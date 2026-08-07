@@ -9,9 +9,7 @@
         </div>
 
         @if (session('status') == 'verification-link-sent')
-            <div class="auth-status">
-                {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-            </div>
+            <x-flash-toast :message="__('A new verification link has been sent to the email address you provided during registration.')" />
         @endif
 
         <div class="auth-actions">

@@ -22,7 +22,7 @@ class AcademicEvent extends Model
 
     public const SCOPE_OPTIONS = [
         'all',
-        'teachers',
+        'professors',
         'faculty',
         'department',
     ];
@@ -35,6 +35,7 @@ class AcademicEvent extends Model
         'scope',
         'department_id',
         'note',
+        'purpose',
     ];
 
     protected function casts(): array
@@ -65,8 +66,8 @@ class AcademicEvent extends Model
     public function getScopeLabelAttribute(): string
     {
         return match ($this->scope) {
-            'all' => 'All teachers and faculty',
-            'teachers' => 'Teachers only',
+            'all' => 'All professors and faculty',
+            'professors' => 'Professors only',
             'faculty' => 'Faculty only',
             'department' => $this->department?->name ? 'Department: ' . $this->department->name : 'Department only',
             default => ucfirst($this->scope),

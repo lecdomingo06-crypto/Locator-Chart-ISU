@@ -11,31 +11,17 @@ class AcademicEventController extends Controller
 {
     public function index()
     {
-        $now = now();
-
-        $activeEvents = AcademicEvent::with('department')
-            ->activeAt($now)
-            ->orderBy('start_datetime')
-            ->get();
-
-        $upcomingEvents = AcademicEvent::with('department')
-            ->upcomingFrom($now)
-            ->orderBy('start_datetime')
-            ->get();
-
-        $pastEvents = AcademicEvent::with('department')
-            ->where('end_datetime', '<', $now)
-            ->orderByDesc('start_datetime')
-            ->get();
-
-        return view('academic_events.index', compact('activeEvents', 'upcomingEvents', 'pastEvents'));
+        return view('academic_events.index', $this->eventBuckets());
     }
 
     public function create()
     {
         $departments = Department::orderBy('name')->get();
 
-        return view('academic_events.create', compact('departments'));
+        return view('academic_events.create', [
+            'departments' => $departments,
+            ...$this->eventBuckets(),
+        ]);
     }
 
     public function store(Request $request)
@@ -44,7 +30,7 @@ class AcademicEventController extends Controller
 
         AcademicEvent::create($validated);
 
-        return redirect()->route('academic_events.index')->with('success', 'Academic event created successfully.');
+        return redirect()->route('academic_events.create')->with('success', 'Academic event created successfully.');
     }
 
     public function edit(AcademicEvent $academicEvent)
@@ -60,14 +46,14 @@ class AcademicEventController extends Controller
 
         $academicEvent->update($validated);
 
-        return redirect()->route('academic_events.index')->with('success', 'Academic event updated successfully.');
+        return redirect()->route('academic_events.create')->with('success', 'Academic event updated successfully.');
     }
 
     public function destroy(AcademicEvent $academicEvent)
     {
         $academicEvent->delete();
 
-        return redirect()->route('academic_events.index')->with('success', 'Academic event deleted successfully.');
+        return redirect()->route('academic_events.create')->with('success', 'Academic event deleted successfully.');
     }
 
     protected function validatedData(Request $request): array
@@ -84,6 +70,7 @@ class AcademicEventController extends Controller
                 'exists:departments,id',
             ],
             'note' => ['nullable', 'string'],
+            'purpose' => ['nullable', 'string'],
         ]);
 
         if ($validated['scope'] !== 'department') {
@@ -91,5 +78,25 @@ class AcademicEventController extends Controller
         }
 
         return $validated;
+    }
+
+    protected function eventBuckets(): array
+    {
+        $now = now();
+
+        return [
+            'activeEvents' => AcademicEvent::with('department')
+                ->activeAt($now)
+                ->orderBy('start_datetime')
+                ->get(),
+            'upcomingEvents' => AcademicEvent::with('department')
+                ->upcomingFrom($now)
+                ->orderBy('start_datetime')
+                ->get(),
+            'pastEvents' => AcademicEvent::with('department')
+                ->where('end_datetime', '<', $now)
+                ->orderByDesc('start_datetime')
+                ->get(),
+        ];
     }
 }

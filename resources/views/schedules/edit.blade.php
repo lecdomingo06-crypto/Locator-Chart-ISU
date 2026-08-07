@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+    <title>{{ config('app.name', 'Professor Tracker') }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
@@ -504,6 +504,7 @@
             }
         }
     </style>
+    <x-minimal-ui />
 </head>
 <body>
     <div class="page">
@@ -512,7 +513,7 @@
                 <div class="brand">
                     <div class="brand-mark" aria-hidden="true"></div>
                     <div class="brand-copy">
-                        <strong>Teacher Tracking System</strong>
+                        <strong>Professor Tracking System</strong>
                         <span>Weekly teaching schedule manager</span>
                     </div>
                 </div>
@@ -538,9 +539,8 @@
                             </section>
                         @endif
 
-                        <form method="POST" action="{{ route('schedules.update', $schedule) }}" class="schedule-form">
+                        <form method="POST" action="{{ route('schedules.update.post', $schedule) }}" class="schedule-form">
                             @csrf
-                            @method('PUT')
 
                             <div class="field-grid">
                                 <div class="field">

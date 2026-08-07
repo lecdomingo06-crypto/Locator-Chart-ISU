@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Schedule;
 use App\Models\SpecialSchedule;
+use App\Models\StatusOverride;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,11 +19,7 @@ class SpecialScheduleController extends Controller
 
     public function index()
     {
-        $specialSchedules = SpecialSchedule::where('user_id', Auth::id())
-            ->orderBy('start_datetime')
-            ->get();
-
-        return view('special_schedules.index', compact('specialSchedules'));
+        return redirect()->route('special_schedules.create');
     }
 
     public function create()
@@ -42,14 +39,15 @@ class SpecialScheduleController extends Controller
 
         $userId = Auth::id();
 
-        SpecialSchedule::create($this->specialSchedulePayload($request, $userId));
+        $specialSchedule = SpecialSchedule::create($this->specialSchedulePayload($request, $userId));
+        $this->replaceOverlappingAdminOverrides($specialSchedule);
 
-        return redirect()->route('special_schedules.index')->with('success', 'Special schedule added successfully.');
+        return redirect()->route('special_schedules.create')->with('success', 'Special schedule added successfully.');
     }
 
     public function edit(SpecialSchedule $specialSchedule)
     {
-        if ($specialSchedule->user_id !== Auth::id()) {
+        if (! $this->belongsToCurrentUser($specialSchedule)) {
             abort(403);
         }
 
@@ -58,7 +56,7 @@ class SpecialScheduleController extends Controller
 
     public function update(Request $request, SpecialSchedule $specialSchedule)
     {
-        if ($specialSchedule->user_id !== Auth::id()) {
+        if (! $this->belongsToCurrentUser($specialSchedule)) {
             abort(403);
         }
 
@@ -71,24 +69,25 @@ class SpecialScheduleController extends Controller
         ]);
 
         $specialSchedule->update($this->specialSchedulePayload($request, Auth::id(), false));
+        $this->replaceOverlappingAdminOverrides($specialSchedule);
 
-        return redirect()->route('special_schedules.index')->with('success', 'Special schedule updated successfully.');
+        return redirect()->route('special_schedules.create')->with('success', 'Special schedule updated successfully.');
     }
 
     public function destroy(SpecialSchedule $specialSchedule)
     {
-        if ($specialSchedule->user_id !== Auth::id()) {
+        if (! $this->belongsToCurrentUser($specialSchedule)) {
             abort(403);
         }
 
         $specialSchedule->delete();
 
-        return redirect()->route('special_schedules.index')->with('success', 'Special schedule deleted successfully.');
+        return redirect()->route('special_schedules.create')->with('success', 'Special schedule deleted successfully.');
     }
 
     private function specialSchedulePayload(Request $request, int $userId, bool $includeUserId = true): array
     {
-        $keepUntilScheduleEnd = Auth::user()?->role === 'teacher'
+        $keepUntilScheduleEnd = Auth::user()?->role === 'professor'
             && $request->type === 'On Meeting'
             && $request->boolean('keep_until_schedule_end');
         $resolvedEndDatetime = $this->resolveEndDatetime(
@@ -146,5 +145,39 @@ class SpecialScheduleController extends Controller
         return $scheduleEnd->greaterThan($endMoment)
             ? $scheduleEnd->toDateTimeString()
             : $endMoment->toDateTimeString();
+    }
+
+    private function belongsToCurrentUser(SpecialSchedule $specialSchedule): bool
+    {
+        return (string) $specialSchedule->user_id === (string) Auth::id();
+    }
+
+    private function replaceOverlappingAdminOverrides(SpecialSchedule $specialSchedule): void
+    {
+        $start = Carbon::parse($specialSchedule->start_datetime);
+        $end = Carbon::parse($specialSchedule->end_datetime);
+
+        StatusOverride::query()
+            ->where('user_id', $specialSchedule->user_id)
+            ->where('start_datetime', '<', $end)
+            ->where('end_datetime', '>', $start)
+            ->get()
+            ->each(function (StatusOverride $override) use ($start) {
+                $overrideStart = Carbon::parse($override->start_datetime);
+
+                if ($overrideStart->lt($start)) {
+                    $replacementEnd = $start->copy()->subSecond();
+
+                    if ($replacementEnd->gt($overrideStart)) {
+                        $override->update([
+                            'end_datetime' => $replacementEnd->toDateTimeString(),
+                        ]);
+
+                        return;
+                    }
+                }
+
+                $override->delete();
+            });
     }
 }

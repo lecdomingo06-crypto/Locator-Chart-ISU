@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+        <title>{{ config('app.name', 'Professor Tracker') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
@@ -760,7 +760,8 @@
                 }
             }
         </style>
-    </head>
+    <x-minimal-ui />
+</head>
     <body>
         <div class="page">
             <div class="shell">
@@ -768,13 +769,13 @@
                     <div class="brand">
                         <div class="brand-mark" aria-hidden="true"></div>
                         <div class="brand-copy">
-                            <strong>Teacher Tracking System</strong>
-                            <span>Teacher workspace for schedules, profile, and live viewer access</span>
+                            <strong>Professor Tracking System</strong>
+                            <span>Professor workspace for schedules, profile, and live viewer access</span>
                         </div>
                     </div>
 
                     <div class="topbar-actions">
-                        <div class="status-pill">Teacher Portal</div>
+                        <div class="status-pill">Professor Portal</div>
                         <form method="POST" action="{{ route('logout') }}" class="logout-form">
                             @csrf
                             <button type="submit" class="logout-button">Logout</button>
@@ -788,8 +789,8 @@
                         <div class="hero-inner">
                             <div class="hero-top">
                                 <div class="hero-copy">
-                                    <div class="eyebrow">Teacher Dashboard</div>
-                                    <h1>Welcome back, Teacher.</h1>
+                                    <div class="eyebrow">Professor Dashboard</div>
+                                    <h1>Welcome back, Professor.</h1>
                                     <p>
                                         Open your main tools from one cleaner dashboard.
                                     </p>

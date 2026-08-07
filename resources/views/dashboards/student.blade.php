@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+        <title>{{ config('app.name', 'Professor Tracker') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
@@ -445,7 +445,7 @@
 
             .studio {
                 display: grid;
-                grid-template-columns: minmax(0, 1fr) minmax(360px, 0.96fr);
+                grid-template-columns: minmax(0, 1fr);
                 gap: 28px;
                 margin-top: 14px;
                 align-items: stretch;
@@ -801,6 +801,19 @@
                 height: 100%;
             }
 
+            @media (min-width: 981px) {
+                .campus-map-card--sidebar {
+                    height: auto;
+                    min-height: 820px;
+                }
+
+                .campus-map-surface--sidebar,
+                .campus-map-live {
+                    height: 620px;
+                    min-height: 620px;
+                }
+            }
+
             @keyframes campusLegendCarousel {
                 from {
                     transform: translateX(0);
@@ -935,54 +948,20 @@
                 }
             }
         </style>
-    </head>
+    <x-minimal-ui />
+</head>
     <body>
-        <div class="page">
+        <div class="student-workspace">
+            <x-student-sidebar active="map" />
+
+            <main class="student-content">
+                <div class="page">
             <div class="shell">
-                <section class="masthead">
-                    <div class="brand-band">
-                        <div class="brand-mark" aria-hidden="true"></div>
-                        <div class="brand-copy">
-                            <strong>Teacher Tracking System</strong>
-                            <span>Student dashboard with direct access to teacher and faculty availability</span>
-                        </div>
-                    </div>
-
-                    <div class="status-pill">Student portal active</div>
-                </section>
-
-                <main class="studio">
-                    <section class="hero-panel">
-                        <div class="hero-inner">
-                            <div class="eyebrow">Isabela State University Cauayan City Campus</div>
-
-                            <div class="hero-grid">
-                                <div class="hero-copy">
-                                    <div class="hero-greeting">Welcome back, {{ auth()->user()->full_name ?? 'Student' }}</div>
-                                    <h1>Check Staff Availability</h1>
-                                    <p>
-                                        Open the Teacher and Faculty Viewer to monitor instructor availability, review assigned schedules,
-                                        and use the campus guide map to head to the right department with less guesswork.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="actions">
-                                <a href="{{ route('student.viewer') }}" class="button">Open Teacher/Faculty Viewer</a>
-
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="button-secondary">Logout</button>
-                                </form>
-                            </div>
-
-                        </div>
-                    </section>
-
-                    <aside class="map-stack" aria-label="Student campus guide">
+                                <div class="studio">
+                                        <aside class="map-stack" aria-label="Student campus guide">
                         <section class="campus-map-card campus-map-card--sidebar" aria-label="Freshman campus guide">
                             <div class="campus-map-copy campus-map-copy--stack">
-                                <div class="campus-map-kicker">Campus guide</div>
+                                <div class="campus-map-kicker">Campus Map</div>
                             </div>
 
                             <div class="campus-map-layout campus-map-layout--sidebar">
@@ -1113,8 +1092,10 @@
                             </div>
                         </section>
                     </aside>
-                </main>
+                </div>
             </div>
+                </div>
+            </main>
         </div>
 
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

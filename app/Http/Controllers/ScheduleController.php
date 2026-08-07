@@ -10,17 +10,14 @@ class ScheduleController extends Controller
 {
     public function index()
     {
-        $schedules = Schedule::where('user_id', Auth::id())
-            ->orderByRaw("FIELD(day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
-            ->orderBy('start_time')
-            ->get();
-
-        return view('schedules.index', compact('schedules'));
+        return redirect()->route('schedules.create');
     }
 
     public function create()
     {
-        return view('schedules.create');
+        $schedules = $this->currentUserSchedules();
+
+        return view('schedules.create', compact('schedules'));
     }
 
     public function store(Request $request)
@@ -46,13 +43,15 @@ class ScheduleController extends Controller
             'school_year' => $request->school_year,
         ]);
 
-        return redirect()->route('schedules.index')->with('success', 'Schedule added successfully.');
+        return redirect()->route('schedules.create')->with('success', 'Schedule added successfully.');
     }
 
     public function edit(Schedule $schedule)
     {
-        if ($schedule->user_id !== Auth::id()) {
-            abort(403);
+        if (! $this->belongsToCurrentUser($schedule)) {
+            return redirect()
+                ->route('schedules.create')
+                ->with('error', 'That schedule is not available for this account.');
         }
 
         return view('schedules.edit', compact('schedule'));
@@ -60,8 +59,10 @@ class ScheduleController extends Controller
 
     public function update(Request $request, Schedule $schedule)
     {
-        if ($schedule->user_id !== Auth::id()) {
-            abort(403);
+        if (! $this->belongsToCurrentUser($schedule)) {
+            return redirect()
+                ->route('schedules.create')
+                ->with('error', 'That schedule is not available for this account.');
         }
 
         $request->validate([
@@ -84,17 +85,32 @@ class ScheduleController extends Controller
             'school_year',
         ]));
 
-        return redirect()->route('schedules.index')->with('success', 'Schedule updated successfully.');
+        return redirect()->route('schedules.create')->with('success', 'Schedule updated successfully.');
     }
 
     public function destroy(Schedule $schedule)
     {
-        if ($schedule->user_id !== Auth::id()) {
-            abort(403);
+        if (! $this->belongsToCurrentUser($schedule)) {
+            return redirect()
+                ->route('schedules.create')
+                ->with('error', 'That schedule is not available for this account.');
         }
 
         $schedule->delete();
 
-        return redirect()->route('schedules.index')->with('success', 'Schedule deleted successfully.');
+        return redirect()->route('schedules.create')->with('success', 'Schedule deleted successfully.');
+    }
+
+    private function currentUserSchedules()
+    {
+        return Schedule::where('user_id', Auth::id())
+            ->orderByRaw("FIELD(day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
+            ->orderBy('start_time')
+            ->get();
+    }
+
+    private function belongsToCurrentUser(Schedule $schedule): bool
+    {
+        return (string) $schedule->user_id === (string) Auth::id();
     }
 }

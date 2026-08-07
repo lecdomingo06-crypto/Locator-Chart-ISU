@@ -8,13 +8,23 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\StudentRegistrationController;
 use Illuminate\Support\Facades\Route;
+// hCaptcha will be used instead of the in-house math captcha
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    // legacy math captcha regenerate route removed in favor of hCaptcha
+
+    Route::get('student/register', [StudentRegistrationController::class, 'create'])
+        ->name('student.register');
+
+    Route::post('student/register', [StudentRegistrationController::class, 'store'])
+        ->name('student.register.store');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
@@ -47,6 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+
+    Route::get('logout', [AuthenticatedSessionController::class, 'destroy']);
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');

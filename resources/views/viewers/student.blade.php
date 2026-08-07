@@ -44,6 +44,149 @@
                 linear-gradient(180deg, #f7fcf8 0%, var(--bg) 100%);
         }
 
+        .student-workspace {
+            display: grid;
+            grid-template-columns: 228px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .student-sidebar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 22px 14px;
+            border-right: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 12px 0 30px rgba(12, 92, 56, 0.06);
+        }
+
+        .student-sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 8px 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .student-sidebar-mark {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            flex: 0 0 auto;
+            border-radius: 8px;
+            color: #ffffff;
+            background: var(--green-800);
+            font-weight: 800;
+        }
+
+        .student-sidebar-copy {
+            display: grid;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .student-sidebar-copy strong {
+            font-size: 0.92rem;
+        }
+
+        .student-sidebar-copy span,
+        .student-sidebar-note,
+        .student-account span {
+            color: var(--muted);
+            font-size: 0.78rem;
+            line-height: 1.45;
+        }
+
+        .student-sidebar-note {
+            margin: 18px 8px 22px;
+        }
+
+        .student-nav-label {
+            margin: 0 8px 9px;
+            color: #7b8c81;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .student-nav {
+            display: grid;
+            gap: 6px;
+        }
+
+        .student-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 43px;
+            padding: 0 12px;
+            border-radius: 7px;
+            color: var(--text);
+            font-size: 0.86rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .student-nav-link:hover {
+            background: var(--green-100);
+        }
+
+        .student-nav-link.is-active {
+            color: #ffffff;
+            background: var(--green-800);
+        }
+
+        .student-nav-link svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .student-account {
+            display: grid;
+            gap: 3px;
+            margin: auto 8px 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .student-account strong {
+            overflow: hidden;
+            font-size: 0.84rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .student-logout-form {
+            margin: 0 8px;
+        }
+
+        .student-logout-button {
+            width: 100%;
+            min-height: 39px;
+            border: 1px solid rgba(20, 114, 71, 0.28);
+            border-radius: 7px;
+            color: var(--green-900);
+            background: #ffffff;
+            font: inherit;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .student-content {
+            min-width: 0;
+        }
         .page {
             position: relative;
             z-index: 1;
@@ -540,6 +683,41 @@
             line-height: 1.8;
         }
 
+        @media (max-width: 840px) {
+            .student-workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .student-sidebar {
+                position: static;
+                height: auto;
+                padding: 16px;
+                border-right: 0;
+                border-bottom: 1px solid var(--card-border);
+            }
+
+            .student-sidebar-note,
+            .student-nav-label {
+                display: none;
+            }
+
+            .student-nav {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                margin-top: 14px;
+            }
+
+            .student-nav-link {
+                justify-content: center;
+            }
+
+            .student-account {
+                margin: 14px 8px 8px;
+            }
+
+            .student-logout-form {
+                width: min(220px, 100%);
+            }
+        }
         @media (max-width: 1024px) {
             .hero-stats,
             .filter-form {
@@ -590,14 +768,76 @@
             }
         }
     </style>
+    <x-minimal-ui />
+    <style data-viewer-minimal-fix>
+        .student-content .page {
+            padding: 24px !important;
+        }
+
+        .student-content .shell {
+            width: 100% !important;
+            max-width: 1180px !important;
+            margin-inline: auto !important;
+        }
+
+        .student-content .topbar h1 {
+            font-size: 2.9rem !important;
+            line-height: 1.05 !important;
+            color: #f5fff8 !important;
+        }
+
+        .student-content .hero-copy p {
+            color: rgba(241, 255, 246, 0.82) !important;
+            line-height: 1.7 !important;
+        }
+
+        .student-content .viewer-grid {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+            gap: 16px !important;
+        }
+
+        .student-content .viewer-card {
+            gap: 16px !important;
+            padding: 20px !important;
+            border-radius: 20px !important;
+        }
+
+        .student-content .viewer-title h3 {
+            font-size: 1.15rem !important;
+            line-height: 1.25 !important;
+        }
+
+        @media (max-width: 720px) {
+            .student-content .page {
+                padding: 16px !important;
+            }
+
+            .student-content .topbar h1 {
+                font-size: 1.8rem !important;
+            }
+
+            .student-content .viewer-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .student-content .viewer-card {
+                padding: 16px !important;
+                border-radius: 18px !important;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="page">
+    <div class="student-workspace">
+        <x-student-sidebar active="viewer" />
+
+        <main class="student-content">
+            <div class="page">
         <div class="shell">
             <section class="topbar">
                 <div class="hero-copy">
                     <div class="eyebrow">Student Viewer</div>
-                    <h1>Teacher and Faculty Availability</h1>
+                    <h1>Professor and Faculty Availability</h1>
                     <p>
                         A simpler live viewer for students to check who is available right now.
                     </p>
@@ -653,7 +893,7 @@
             <section class="results-head" aria-label="Results summary">
                 <div class="results-copy">
                     <span>Live Directory</span>
-                    <h2>Teacher and Faculty List</h2>
+                    <h2>Professor and Faculty List</h2>
                 </div>
 
                 <div class="results-meta">
@@ -675,6 +915,8 @@
                                 'On Leave' => '#dc2626',
                                 'Emergency' => '#f59e0b',
                                 'On Meeting' => '#7c3aed',
+                                'On Break' => '#d97706',
+                                'Not Available' => '#6b7280',
                                 'Holiday' => '#d97706',
                                 'Class Suspension' => '#dc2626',
                                 'No Classes' => '#0891b2',
@@ -746,6 +988,13 @@
                                             <div>{{ $statusData['event_note'] }}</div>
                                         </div>
                                     @endif
+
+                                    @if($statusData['event_purpose'])
+                                        <div class="class-line">
+                                            <span>Purpose</span>
+                                            <div>{{ $statusData['event_purpose'] }}</div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @elseif($status === 'On Meeting' && !empty($statusData['status_start_datetime']) && !empty($statusData['status_end_datetime']))
@@ -764,6 +1013,25 @@
                                     <div class="class-line">
                                         <span>Ends</span>
                                         <div>{{ $sameMeetingDay ? $meetingEnd->format('g:i A') : $meetingEnd->format('M j, g:i A') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif(in_array($status, ['On Break', 'Not Available'], true) && !empty($statusData['status_start_datetime']) && !empty($statusData['status_end_datetime']))
+                            @php
+                                $availabilityStart = \Carbon\Carbon::parse($statusData['status_start_datetime']);
+                                $availabilityEnd = \Carbon\Carbon::parse($statusData['status_end_datetime']);
+                                $sameAvailabilityDay = $availabilityStart->isSameDay($availabilityEnd);
+                            @endphp
+                            <div class="class-card">
+                                <strong>Availability Time</strong>
+                                <div class="class-details">
+                                    <div class="class-line">
+                                        <span>Starts</span>
+                                        <div>{{ $sameAvailabilityDay ? $availabilityStart->format('g:i A') : $availabilityStart->format('M j, g:i A') }}</div>
+                                    </div>
+                                    <div class="class-line">
+                                        <span>Ends</span>
+                                        <div>{{ $sameAvailabilityDay ? $availabilityEnd->format('g:i A') : $availabilityEnd->format('M j, g:i A') }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -795,12 +1063,14 @@
                     </article>
                 @empty
                     <section class="empty-state">
-                        <h2>No teachers or faculty found.</h2>
+                        <h2>No professors or faculty found.</h2>
                         <p>Try adjusting the name search or department filter to load another set of staff records.</p>
                     </section>
                 @endforelse
             </section>
         </div>
+            </div>
+        </main>
     </div>
 
     <script>

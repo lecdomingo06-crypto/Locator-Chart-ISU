@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+        <title>{{ config('app.name', 'Professor Tracker') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
@@ -759,7 +759,8 @@
                 }
             }
         </style>
-    </head>
+    <x-minimal-ui />
+</head>
     <body>
         <div class="page">
             <div class="shell">
@@ -767,7 +768,7 @@
                     <div class="brand">
                         <div class="brand-mark" aria-hidden="true"></div>
                         <div class="brand-copy">
-                            <strong>Teacher Tracking System</strong>
+                            <strong>Professor Tracking System</strong>
                             <span>Admin workspace for status control and live monitoring</span>
                         </div>
                     </div>
@@ -868,7 +869,7 @@
                                     </span>
                                     <div class="action-copy">
                                         <strong>Create Account</strong>
-                                        <span>Create new student, teacher, and faculty accounts from the admin workspace.</span>
+                                        <span>Create new student, professor, and faculty accounts from the admin workspace.</span>
                                         <span class="action-label">Open Tool</span>
                                     </div>
                                     <span class="action-arrow" aria-hidden="true">
@@ -879,7 +880,7 @@
                                     </span>
                                 </a>
 
-                                <a href="{{ route('academic_events.index') }}" class="action-card">
+                                <a href="{{ route('academic_events.create') }}" class="action-card">
                                     <span class="action-icon" aria-hidden="true">
                                         <svg viewBox="0 0 24 24">
                                             <path d="M7 3v4"></path>

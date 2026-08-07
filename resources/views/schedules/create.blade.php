@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+    <title>{{ config('app.name', 'Professor Tracker') }} - Weekly Schedule</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
@@ -11,19 +11,19 @@
     <style>
         :root {
             color-scheme: light;
-            --bg-top: #eef9f1;
-            --bg-bottom: #dff1e4;
-            --card: rgba(255, 255, 255, 0.84);
-            --card-border: rgba(255, 255, 255, 0.8);
-            --text: #123524;
-            --muted: #5a7261;
+            --bg: #edf7f0;
+            --card: rgba(255, 255, 255, 0.94);
+            --card-soft: #f3fbf5;
+            --card-border: rgba(12, 92, 56, 0.12);
+            --text: #113322;
+            --muted: #607766;
             --green-900: #0c5c38;
             --green-800: #147247;
-            --green-700: #1d8a54;
-            --green-100: #e6f5ea;
-            --shadow: 0 22px 52px rgba(13, 72, 43, 0.12);
+            --green-700: #1b8a53;
+            --green-100: #ddf4e4;
             --danger: #b91c1c;
-            --danger-soft: rgba(254, 226, 226, 0.9);
+            --danger-soft: #fff1f1;
+            --shadow: 0 18px 40px rgba(12, 92, 56, 0.1);
         }
 
         * {
@@ -40,263 +40,337 @@
             font-family: 'Outfit', sans-serif;
             color: var(--text);
             background:
-                radial-gradient(circle at top left, rgba(118, 210, 149, 0.3), transparent 30%),
-                radial-gradient(circle at 82% 18%, rgba(51, 153, 97, 0.22), transparent 18%),
-                linear-gradient(145deg, var(--bg-top), var(--bg-bottom));
+                radial-gradient(circle at top left, rgba(90, 193, 125, 0.24), transparent 22%),
+                radial-gradient(circle at 88% 14%, rgba(32, 153, 90, 0.18), transparent 18%),
+                linear-gradient(180deg, #f7fcf8 0%, var(--bg) 100%);
         }
 
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            z-index: 0;
-            border-radius: 999px;
-            filter: blur(12px);
-            pointer-events: none;
-        }
-
-        body::before {
-            width: 26rem;
-            height: 26rem;
-            top: -8rem;
-            right: -7rem;
-            background: rgba(42, 162, 90, 0.16);
-        }
-
-        body::after {
-            width: 22rem;
-            height: 22rem;
-            left: -6rem;
-            bottom: -8rem;
-            background: rgba(15, 92, 56, 0.1);
-        }
-
-        .page {
-            position: relative;
-            z-index: 1;
+        .workspace-shell {
             min-height: 100vh;
-            padding: 28px;
         }
 
-        .shell {
-            max-width: 1160px;
-            margin: 0 auto;
-            display: grid;
-            gap: 22px;
-        }
-
-        .topbar {
+        .workspace-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 18px;
-            padding: 18px 22px;
-            border-radius: 28px;
-            background: rgba(255, 255, 255, 0.56);
-            border: 1px solid rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(18px);
-            box-shadow: 0 12px 36px rgba(16, 70, 45, 0.08);
+            min-height: 76px;
+            padding: 14px 28px;
+            color: #effcf3;
+            background: linear-gradient(135deg, #094629 0%, #0c5c38 56%, #147247 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 16px 34px rgba(8, 58, 35, 0.2);
         }
 
-        .brand {
+        .workspace-brand,
+        .workspace-session,
+        .workspace-chip,
+        .sidebar-brand,
+        .sidebar-link,
+        .logout-button {
             display: inline-flex;
             align-items: center;
-            gap: 16px;
         }
 
-        .brand-mark {
-            position: relative;
-            width: 54px;
-            height: 54px;
-            border-radius: 18px;
-            background: linear-gradient(160deg, #25a760, #0c5c38);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+        .workspace-brand {
+            gap: 14px;
+            color: inherit;
+            text-decoration: none;
         }
 
-        .brand-mark::before,
-        .brand-mark::after {
-            content: '';
-            position: absolute;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .brand-mark::before {
-            width: 14px;
-            height: 14px;
-            left: 11px;
-            top: 13px;
-            box-shadow: 18px 0 0 rgba(255, 255, 255, 0.95);
-        }
-
-        .brand-mark::after {
-            width: 30px;
-            height: 12px;
-            left: 12px;
-            bottom: 13px;
-            border-radius: 999px 999px 14px 14px;
-        }
-
-        .brand-copy {
+        .workspace-brand-mark,
+        .sidebar-mark {
             display: grid;
-            gap: 4px;
+            place-items: center;
+            border-radius: 8px;
+            font-weight: 800;
         }
 
-        .brand-copy strong {
-            font-size: 1.15rem;
-            letter-spacing: -0.02em;
-        }
-
-        .brand-copy span {
-            color: var(--muted);
-            font-size: 0.95rem;
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            border-radius: 999px;
+        .workspace-brand-mark {
+            width: 48px;
+            height: 48px;
             color: var(--green-900);
-            background: rgba(217, 242, 226, 0.86);
-            border: 1px solid rgba(25, 138, 82, 0.14);
-            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: inset 0 0 0 1px rgba(12, 92, 56, 0.08);
+        }
+
+        .workspace-brand-copy,
+        .sidebar-copy {
+            display: grid;
+            gap: 3px;
+        }
+
+        .workspace-brand-copy strong,
+        .sidebar-copy strong {
+            font-size: 1rem;
+        }
+
+        .workspace-brand-copy span,
+        .sidebar-copy span,
+        .sidebar-note {
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .workspace-brand-copy span {
+            color: rgba(239, 252, 243, 0.76);
             font-weight: 600;
         }
 
-        .status-pill::before {
-            content: '';
-            width: 10px;
-            height: 10px;
-            border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.14);
+        .workspace-session {
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        .content {
+        .workspace-chip {
+            min-height: 34px;
+            padding: 0 13px;
+            border-radius: 999px;
+            color: rgba(239, 252, 243, 0.95);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 0.86rem;
+            font-weight: 700;
+        }
+
+        .logout-form {
+            margin: 0;
+        }
+
+        .logout-button {
+            justify-content: center;
+            min-height: 38px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 999px;
+            color: var(--green-900);
+            background: #ffffff;
+            font-size: 0.86rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 12px 22px rgba(5, 51, 30, 0.16);
+        }
+
+        .workspace-layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
-            gap: 24px;
+            grid-template-columns: 244px minmax(0, 1fr);
+            gap: 26px;
             align-items: start;
         }
 
-        .form-card,
-        .info-card {
-            position: relative;
-            overflow: hidden;
-            border-radius: 32px;
+        .workspace-sidebar {
+            position: sticky;
+            top: 94px;
+            min-height: calc(100vh - 112px);
+            margin-left: 16px;
+            padding: 18px 14px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--card-border);
+            border-left: 0;
+            border-radius: 0 8px 8px 0;
             box-shadow: var(--shadow);
         }
 
-        .form-card {
-            padding: 30px;
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            backdrop-filter: blur(16px);
+        .sidebar-brand {
+            gap: 12px;
+            padding: 0 0 18px;
+            border-bottom: 1px solid rgba(12, 92, 56, 0.1);
         }
 
-        .form-card::before {
-            content: '';
-            position: absolute;
-            left: -8%;
-            bottom: -14%;
-            width: 20rem;
-            height: 20rem;
-            border-radius: 46% 54% 58% 42%;
-            background: linear-gradient(180deg, rgba(29, 138, 87, 0.14), rgba(12, 92, 56, 0.04));
+        .sidebar-mark {
+            flex: 0 0 54px;
+            width: 54px;
+            height: 54px;
+            color: #ffffff;
+            background: linear-gradient(145deg, var(--green-800), var(--green-900));
         }
 
-        .form-inner,
-        .info-inner {
-            position: relative;
-            z-index: 1;
+        .sidebar-copy span,
+        .sidebar-note {
+            color: var(--muted);
+        }
+
+        .sidebar-note {
+            margin: 14px 0 18px;
+        }
+
+        .sidebar-section-label {
+            display: block;
+            margin: 0 0 10px;
+            color: #6c7d70;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
             display: grid;
-            gap: 20px;
+            gap: 8px;
         }
 
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            width: fit-content;
-            padding: 10px 16px;
-            border-radius: 999px;
-            background: rgba(12, 92, 56, 0.08);
+        .sidebar-link {
+            gap: 11px;
+            min-height: 44px;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        .sidebar-link svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .sidebar-link:hover {
             color: var(--green-900);
-            font-size: 0.84rem;
-            font-weight: 700;
+            background: var(--green-100);
+        }
+
+        .sidebar-link.is-active {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--green-800), var(--green-900));
+            box-shadow: 0 12px 24px rgba(12, 92, 56, 0.16);
+        }
+
+        .workspace-main .page {
+            padding: 24px 28px 32px 0;
+        }
+
+        .shell {
+            display: grid;
+            gap: 18px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 2px 2px 0;
+        }
+
+        .title-copy {
+            display: grid;
+            gap: 6px;
+        }
+
+        .title-copy span {
+            color: var(--green-800);
+            font-size: 0.78rem;
+            font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
-        .eyebrow::before {
-            content: '';
-            width: 28px;
-            height: 1px;
-            background: rgba(12, 92, 56, 0.32);
-        }
-
-        h1 {
+        .title-copy h1 {
             margin: 0;
-            font-size: clamp(2.2rem, 4vw, 3.4rem);
-            line-height: 0.98;
-            letter-spacing: -0.05em;
+            font-size: 1.45rem;
+            letter-spacing: -0.03em;
         }
 
-        .intro {
-            margin: 0;
-            max-width: 48ch;
-            color: var(--muted);
-            font-size: 1rem;
-            line-height: 1.75;
+        .title-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            color: var(--green-900);
+            background: rgba(221, 244, 228, 0.8);
+            border: 1px solid rgba(20, 114, 71, 0.1);
+            font-size: 0.82rem;
+            font-weight: 700;
         }
 
-        .error-summary {
+        .content-grid {
             display: grid;
-            gap: 8px;
-            padding: 16px 18px;
+            grid-template-columns: minmax(330px, 0.72fr) minmax(0, 1.28fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .form-panel,
+        .table-panel,
+        .empty-state {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
             border-radius: 20px;
-            color: #7f1d1d;
-            background: var(--danger-soft);
-            border: 1px solid rgba(185, 28, 28, 0.14);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 251, 246, 0.96));
+            box-shadow: var(--shadow);
         }
 
-        .error-summary strong {
-            font-size: 0.98rem;
+        .form-panel::before,
+        .table-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--green-900), var(--green-700));
         }
 
-        .error-summary ul {
-            margin: 0;
-            padding-left: 18px;
+        .form-panel,
+        .table-panel {
+            padding: 20px;
+        }
+
+        .panel-head {
             display: grid;
-            gap: 4px;
+            gap: 6px;
+            margin-bottom: 18px;
+        }
+
+        .panel-head span {
+            color: var(--green-800);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .panel-head h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            letter-spacing: -0.03em;
         }
 
         .schedule-form {
             display: grid;
-            gap: 18px;
+            gap: 14px;
         }
 
         .field-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-        }
-
-        .field {
-            display: grid;
-            gap: 8px;
+            gap: 12px;
         }
 
         .field.full {
             grid-column: 1 / -1;
         }
 
+        .field {
+            display: grid;
+            gap: 8px;
+            min-width: 0;
+        }
+
         .field label {
             color: var(--green-900);
-            font-size: 0.82rem;
-            font-weight: 700;
+            font-size: 0.78rem;
+            font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
@@ -304,340 +378,768 @@
         .field input,
         .field select {
             width: 100%;
-            min-height: 56px;
-            padding: 0 18px;
-            border: 1px solid rgba(18, 53, 36, 0.12);
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.92);
+            min-height: 44px;
+            padding: 0 13px;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
             color: var(--text);
+            background: rgba(255, 255, 255, 0.96);
             font: inherit;
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+            outline: none;
         }
 
         .field input:focus,
         .field select:focus {
-            outline: none;
-            border-color: rgba(20, 114, 71, 0.44);
-            box-shadow: 0 0 0 4px rgba(29, 138, 84, 0.12);
+            border-color: rgba(20, 114, 71, 0.42);
+            box-shadow: 0 0 0 4px rgba(20, 114, 71, 0.12);
         }
 
         .field-error {
             margin: 0;
             color: var(--danger);
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.82rem;
+            font-weight: 700;
         }
 
-        .form-actions {
+        .error-summary {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 14px;
+            border-radius: 14px;
+            color: var(--danger);
+            background: var(--danger-soft);
+            border: 1px solid rgba(185, 28, 28, 0.14);
+            font-weight: 700;
+        }
+
+        .error-summary ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .form-actions,
+        .modal-actions {
             display: flex;
-            gap: 14px;
             flex-wrap: wrap;
-            align-items: center;
-            padding-top: 6px;
+            gap: 10px;
         }
 
         .primary-button,
-        .secondary-link {
+        .secondary-link,
+        .danger-button,
+        .ghost-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 52px;
-            padding: 0 22px;
-            border-radius: 18px;
+            min-height: 44px;
+            padding: 0 16px;
+            border-radius: 12px;
             font: inherit;
-            font-weight: 700;
+            font-size: 0.86rem;
+            font-weight: 800;
             text-decoration: none;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            cursor: pointer;
         }
 
         .primary-button {
-            border: none;
-            color: #fff;
-            cursor: pointer;
+            border: 0;
+            color: #ffffff;
             background: linear-gradient(135deg, var(--green-800), var(--green-900));
-            box-shadow: 0 18px 30px rgba(12, 92, 56, 0.22);
+            box-shadow: 0 14px 28px rgba(20, 114, 71, 0.2);
         }
 
-        .secondary-link {
+        .secondary-link,
+        .ghost-button {
             color: var(--green-900);
-            background: rgba(255, 255, 255, 0.82);
-            border: 1px solid rgba(12, 92, 56, 0.14);
-            box-shadow: 0 12px 24px rgba(14, 76, 46, 0.08);
+            background: rgba(221, 244, 228, 0.72);
+            border: 1px solid rgba(20, 114, 71, 0.16);
         }
 
-        .primary-button:hover,
-        .secondary-link:hover {
-            transform: translateY(-2px);
+        .danger-button {
+            border: 0;
+            color: #ffffff;
+            background: var(--danger);
         }
 
-        .info-card {
-            padding: 26px;
-            color: #eefcf2;
-            background:
-                radial-gradient(circle at top right, rgba(74, 222, 128, 0.24), transparent 28%),
-                linear-gradient(180deg, #156941 0%, #0c5434 55%, #083924 100%);
+        .schedule-table-wrap {
+            overflow-x: auto;
+            border: 1px solid rgba(20, 114, 71, 0.1);
+            border-radius: 16px;
+            background: #ffffff;
         }
 
-        .info-card::before,
-        .info-card::after {
-            content: '';
-            position: absolute;
-            border-radius: 999px;
-            pointer-events: none;
+        .weekly-table {
+            width: 100%;
+            min-width: 780px;
+            border-collapse: collapse;
+            table-layout: fixed;
         }
 
-        .info-card::before {
-            width: 16rem;
-            height: 16rem;
-            top: -6rem;
-            right: -4rem;
-            background: rgba(219, 255, 228, 0.12);
+        .weekly-table th,
+        .weekly-table td {
+            border: 1px solid rgba(20, 114, 71, 0.12);
+            vertical-align: top;
         }
 
-        .info-card::after {
-            width: 14rem;
-            height: 14rem;
-            left: -4rem;
-            bottom: -5rem;
-            background: rgba(180, 250, 200, 0.08);
-        }
-
-        .info-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            width: fit-content;
-            padding: 9px 14px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.84rem;
-            font-weight: 700;
-        }
-
-        .info-tag::before {
-            content: '';
-            width: 9px;
-            height: 9px;
-            border-radius: 999px;
-            background: #4ade80;
-        }
-
-        .info-card h2 {
-            margin: 0;
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            line-height: 1;
-            letter-spacing: -0.04em;
-        }
-
-        .info-card p {
-            margin: 0;
-            color: rgba(238, 252, 242, 0.78);
-            line-height: 1.72;
-        }
-
-        .info-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .info-item {
-            padding: 16px;
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        .info-item span {
-            display: block;
-            color: rgba(238, 252, 242, 0.66);
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
+        .weekly-table th {
+            height: 42px;
+            padding: 10px;
+            color: var(--green-900);
+            background: rgba(221, 244, 228, 0.72);
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
-        .info-item strong {
-            display: block;
-            margin-top: 8px;
-            font-size: 1rem;
-            line-height: 1.55;
+        .weekly-table .time-col {
+            width: 132px;
+            color: var(--muted);
+            background: rgba(247, 252, 248, 0.9);
         }
 
-        @media (max-width: 960px) {
-            .content {
+        .weekly-table td {
+            min-height: 74px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.88);
+            overflow: hidden;
+        }
+
+        .time-slot {
+            display: grid;
+            gap: 4px;
+            color: var(--text);
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .time-slot span {
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .schedule-cell {
+            display: grid;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .schedule-chip {
+            display: grid;
+            gap: 4px;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            min-height: 58px;
+            padding: 9px 10px;
+            border: 1px solid rgba(20, 114, 71, 0.18);
+            border-radius: 12px;
+            color: var(--text);
+            background: linear-gradient(180deg, rgba(221, 244, 228, 0.9), rgba(232, 245, 236, 0.72));
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .schedule-chip:hover {
+            border-color: rgba(20, 114, 71, 0.32);
+            box-shadow: 0 12px 24px rgba(12, 92, 56, 0.1);
+        }
+
+        .schedule-chip strong {
+            font-size: 0.88rem;
+            line-height: 1.25;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .schedule-chip span {
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .empty-cell {
+            min-height: 58px;
+            border-radius: 10px;
+            background: repeating-linear-gradient(
+                135deg,
+                rgba(20, 114, 71, 0.025),
+                rgba(20, 114, 71, 0.025) 6px,
+                rgba(20, 114, 71, 0.055) 7px
+            );
+        }
+
+        .empty-state {
+            padding: 22px;
+            text-align: center;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+            font-size: 1.15rem;
+        }
+
+        .empty-state p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .schedule-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(8, 41, 25, 0.42);
+        }
+
+        .schedule-modal.is-open {
+            display: flex;
+        }
+
+        .modal-dialog {
+            width: min(500px, 100%);
+            overflow: hidden;
+            border: 1px solid rgba(20, 114, 71, 0.14);
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 28px 70px rgba(8, 41, 25, 0.28);
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 22px;
+            border-bottom: 1px solid rgba(20, 114, 71, 0.1);
+        }
+
+        .modal-head span {
+            color: var(--green-800);
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .modal-head h3 {
+            margin: 5px 0 0;
+            font-size: 1.25rem;
+            letter-spacing: -0.03em;
+        }
+
+        .modal-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(20, 114, 71, 0.14);
+            border-radius: 999px;
+            color: var(--green-900);
+            background: rgba(221, 244, 228, 0.72);
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            display: grid;
+            gap: 16px;
+            padding: 20px 22px 22px;
+        }
+
+        .modal-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .modal-detail {
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(221, 244, 228, 0.52);
+            border: 1px solid rgba(20, 114, 71, 0.1);
+        }
+
+        .modal-detail span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .modal-detail strong {
+            display: block;
+            margin-top: 6px;
+        }
+
+        .delete-form {
+            display: contents;
+        }
+
+        @media (max-width: 1180px) {
+            .content-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .workspace-topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .workspace-session {
+                justify-content: flex-start;
+            }
+
+            .workspace-layout {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .workspace-sidebar {
+                position: static;
+                min-height: 0;
+                margin: 16px 16px 0;
+                border-left: 1px solid var(--card-border);
+                border-radius: 8px;
+            }
+
+            .sidebar-nav {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+
+            .workspace-main .page {
+                padding: 0 16px 24px;
             }
         }
 
         @media (max-width: 720px) {
-            .page {
-                padding: 18px;
+            .workspace-topbar {
+                padding: 14px 16px;
             }
 
-            .topbar {
-                padding: 16px 18px;
-                border-radius: 24px;
-                flex-direction: column;
-                align-items: flex-start;
+            .workspace-brand-copy span {
+                display: none;
             }
 
-            .form-card,
-            .info-card {
-                padding: 22px;
-                border-radius: 28px;
+            .workspace-session,
+            .workspace-chip,
+            .logout-form,
+            .logout-button {
+                width: 100%;
             }
 
-            .field-grid {
+            .workspace-sidebar {
+                margin: 14px 14px 0;
+                padding: 16px;
+            }
+
+            .sidebar-nav,
+            .field-grid,
+            .modal-details {
                 grid-template-columns: 1fr;
             }
 
-            .form-actions {
+            .workspace-main .page {
+                padding: 0 14px 20px;
+            }
+
+            .page-title {
+                align-items: flex-start;
                 flex-direction: column;
-                align-items: stretch;
+            }
+
+            .form-panel,
+            .table-panel {
+                padding: 16px;
+                border-radius: 18px;
             }
 
             .primary-button,
-            .secondary-link {
+            .secondary-link,
+            .danger-button,
+            .ghost-button {
                 width: 100%;
             }
         }
     </style>
+    <x-minimal-ui />
 </head>
 <body>
-    <div class="page">
-        <div class="shell">
-            <section class="topbar">
-                <div class="brand">
-                    <div class="brand-mark" aria-hidden="true"></div>
-                    <div class="brand-copy">
-                        <strong>Teacher Tracking System</strong>
-                        <span>Weekly teaching schedule manager</span>
+@php
+    $user = auth()->user();
+    $displayName = $user->full_name ?: $user->username;
+    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag;
+    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    $timeSlots = $schedules
+        ->map(fn ($schedule) => [
+            'key' => $schedule->start_time . '|' . $schedule->end_time,
+            'start' => $schedule->start_time,
+            'end' => $schedule->end_time,
+        ])
+        ->unique('key')
+        ->sortBy('start')
+        ->values();
+    $schedulesBySlotDay = $schedules->groupBy(
+        fn ($schedule) => $schedule->start_time . '|' . $schedule->end_time . '|' . $schedule->day_of_week
+    );
+    $formatTime = fn ($time) => \Carbon\Carbon::parse($time)->format('g:i A');
+@endphp
+
+    <div class="workspace-shell">
+        <header class="workspace-topbar">
+            <a href="{{ route('staff.viewer') }}" class="workspace-brand">
+                <div class="workspace-brand-mark" aria-hidden="true"><img src="{{ asset('images/isulogo.jpg') }}" alt=""></div>
+                <div class="workspace-brand-copy">
+                    <strong>Professor Tracking System</strong>
+                    <span>Professor workspace</span>
+                </div>
+            </a>
+
+            <div class="workspace-session">
+                <span class="workspace-chip">Role: {{ ucfirst($user->role) }}</span>
+                <span class="workspace-chip">Signed in as {{ $displayName }}</span>
+            </div>
+        </header>
+
+        <div class="workspace-layout">
+            <aside class="workspace-sidebar">
+                <div class="sidebar-brand">
+                    <div class="sidebar-mark" aria-hidden="true"><img src="{{ asset('images/isulogo.jpg') }}" alt=""></div>
+                    <div class="sidebar-copy">
+                        <strong>Professor Panel</strong>
+                        <span>Schedule and profile tools</span>
                     </div>
                 </div>
 
-                <div class="status-pill">Create schedule entry</div>
-            </section>
+                <p class="sidebar-note">Create regular class schedules and review saved weekly entries.</p>
 
-            <section class="content">
-                <section class="form-card">
-                    <div class="form-inner">
-                        <div class="eyebrow">Weekly Schedule</div>
-                        <h1>Add Weekly Schedule</h1>
-                        <p class="intro">Create a new class entry with a cleaner form that matches your schedule manager.</p>
+                <span class="sidebar-section-label">Workspace</span>
+                <nav class="sidebar-nav" aria-label="Professor workspace">
+                    <a href="{{ route('staff.viewer') }}" class="sidebar-link{{ request()->routeIs('staff.viewer') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"></path>
+                            <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6Z"></path>
+                        </svg>
+                        <span>Live Viewer</span>
+                    </a>
 
-                        @if($errors->any())
-                            <section class="error-summary" aria-label="Validation errors">
-                                <strong>Please review the highlighted schedule details.</strong>
-                                <ul>
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
+                    <a href="{{ route('attendance.show') }}" class="sidebar-link{{ request()->routeIs('attendance.*') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <path d="M12 7v5l3 2"></path>
+                        </svg>
+                        <span>Attendance</span>
+                    </a>
+                    <a href="{{ route('availability.show') }}" class="sidebar-link{{ request()->routeIs('availability.*') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 2v4"></path>
+                            <path d="M12 18v4"></path>
+                            <path d="M4.9 4.9l2.8 2.8"></path>
+                            <path d="M16.3 16.3l2.8 2.8"></path>
+                            <path d="M2 12h4"></path>
+                            <path d="M18 12h4"></path>
+                            <path d="M4.9 19.1l2.8-2.8"></path>
+                            <path d="M16.3 7.7l2.8-2.8"></path>
+                        </svg>
+                        <span>Availability</span>
+                    </a>
+
+                    <a href="{{ route('profile.edit') }}" class="sidebar-link{{ request()->routeIs('profile.edit') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z"></path>
+                            <path d="M4.5 20c.8-3.8 3.4-5.8 7.5-5.8s6.7 2 7.5 5.8"></path>
+                        </svg>
+                        <span>Profile</span>
+                    </a>
+
+                    <a href="{{ route('schedules.create') }}" class="sidebar-link{{ request()->routeIs('schedules.*') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M7 3v4"></path>
+                            <path d="M17 3v4"></path>
+                            <path d="M4 8h16"></path>
+                            <path d="M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"></path>
+                            <path d="M8 13h8"></path>
+                            <path d="M8 17h5"></path>
+                        </svg>
+                        <span>Weekly Schedule</span>
+                    </a>
+
+                    <a href="{{ route('special_schedules.create') }}" class="sidebar-link{{ request()->routeIs('special_schedules.*') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 6l1.6 4.4L18 12l-4.4 1.6L12 18l-1.6-4.4L6 12l4.4-1.6L12 6Z"></path>
+                            <path d="M19 4v4"></path>
+                            <path d="M21 6h-4"></path>
+                        </svg>
+                        <span>Special Schedule</span>
+                    </a>
+                </nav>
+            <x-sidebar-account-footer />
+            </aside>
+<x-responsive-sidebar-control />
+
+            <main class="workspace-main">
+                <div class="page">
+                    <div class="shell">
+                        <section class="page-title" aria-label="Weekly schedule title">
+                            <div class="title-copy">
+                                <span>Weekly Schedule</span>
+                                <h1>Create Schedule Entry</h1>
+                            </div>
+
+                            <div class="title-pill">{{ $schedules->count() }} saved schedule{{ $schedules->count() === 1 ? '' : 's' }}</div>
+                        </section>
+
+                        <x-flash-toast />
+
+                        <section class="content-grid">
+                            <section class="form-panel">
+                                <div class="panel-head">
+                                    <span>Add Schedule</span>
+                                    <h2>Class Details</h2>
+                                </div>
+
+                                @if($errors->any())
+                                    <section class="error-summary" aria-label="Validation errors">
+                                        <strong>Please review the highlighted schedule details.</strong>
+                                        <ul>
+                                            @foreach($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </section>
+                                @endif
+
+                                <form method="POST" action="{{ route('schedules.store') }}" class="schedule-form">
+                                    @csrf
+
+                                    <div class="field-grid">
+                                        <div class="field">
+                                            <label for="subject">Subject</label>
+                                            <input id="subject" type="text" name="subject" value="{{ old('subject') }}" placeholder="Enter subject">
+                                            @error('subject')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="field">
+                                            <label for="room">Room</label>
+                                            <input id="room" type="text" name="room" value="{{ old('room') }}" placeholder="Enter room">
+                                            @error('room')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="field full">
+                                            <label for="day_of_week">Day</label>
+                                            <select id="day_of_week" name="day_of_week">
+                                                <option value="">Select day</option>
+                                                @foreach($days as $day)
+                                                    <option value="{{ $day }}" {{ old('day_of_week') === $day ? 'selected' : '' }}>{{ $day }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('day_of_week')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="field">
+                                            <label for="start_time">Start</label>
+                                            <input id="start_time" type="time" name="start_time" value="{{ old('start_time') }}">
+                                            @error('start_time')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="field">
+                                            <label for="end_time">End</label>
+                                            <input id="end_time" type="time" name="end_time" value="{{ old('end_time') }}">
+                                            @error('end_time')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="field">
+                                            <label for="semester">Semester</label>
+                                            <input id="semester" type="text" name="semester" value="{{ old('semester') }}" placeholder="Enter semester">
+                                            @error('semester')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="field">
+                                            <label for="school_year">School Year</label>
+                                            <input id="school_year" type="text" name="school_year" value="{{ old('school_year') }}" placeholder="Enter school year">
+                                            @error('school_year')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="submit" class="primary-button">Save Schedule</button>
+                                    </div>
+                                </form>
                             </section>
-                        @endif
 
-                        <form method="POST" action="{{ route('schedules.store') }}" class="schedule-form">
-                            @csrf
-
-                            <div class="field-grid">
-                                <div class="field">
-                                    <label for="subject">Subject</label>
-                                    <input id="subject" type="text" name="subject" value="{{ old('subject') }}" placeholder="Enter subject">
-                                    @error('subject')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
+                            <section class="table-panel">
+                                <div class="panel-head">
+                                    <span>Schedule Saved</span>
+                                    <h2>Weekly Timetable</h2>
                                 </div>
 
-                                <div class="field">
-                                    <label for="room">Room</label>
-                                    <input id="room" type="text" name="room" value="{{ old('room') }}" placeholder="Enter room">
-                                    @error('room')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                                @if($schedules->isEmpty())
+                                    <section class="empty-state">
+                                        <h3>No schedules saved yet.</h3>
+                                        <p>Add your first class entry to build your weekly timetable.</p>
+                                    </section>
+                                @else
+                                    <div class="schedule-table-wrap">
+                                        <table class="weekly-table">
+                                            <thead>
+                                                <tr>
+                                                    <th class="time-col">Time</th>
+                                                    @foreach($days as $day)
+                                                        <th>{{ $day }}</th>
+                                                    @endforeach
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($timeSlots as $slot)
+                                                    <tr>
+                                                        <td class="time-col">
+                                                            <div class="time-slot">
+                                                                {{ $formatTime($slot['start']) }}
+                                                                <span>{{ $formatTime($slot['end']) }}</span>
+                                                            </div>
+                                                        </td>
 
-                                <div class="field full">
-                                    <label for="day_of_week">Day of Week</label>
-                                    <select id="day_of_week" name="day_of_week">
-                                        <option value="">Select Day</option>
-                                        @foreach(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
-                                            <option value="{{ $day }}" {{ old('day_of_week') == $day ? 'selected' : '' }}>{{ $day }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('day_of_week')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <div class="field">
-                                    <label for="start_time">Start Time</label>
-                                    <input id="start_time" type="time" name="start_time" value="{{ old('start_time') }}">
-                                    @error('start_time')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <div class="field">
-                                    <label for="end_time">End Time</label>
-                                    <input id="end_time" type="time" name="end_time" value="{{ old('end_time') }}">
-                                    @error('end_time')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <div class="field">
-                                    <label for="semester">Semester</label>
-                                    <input id="semester" type="text" name="semester" value="{{ old('semester') }}" placeholder="Enter semester">
-                                    @error('semester')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <div class="field">
-                                    <label for="school_year">School Year</label>
-                                    <input id="school_year" type="text" name="school_year" value="{{ old('school_year') }}" placeholder="Enter school year">
-                                    @error('school_year')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="form-actions">
-                                <button type="submit" class="primary-button">Save Schedule</button>
-                                <a href="{{ route('schedules.index') }}" class="secondary-link">Back to Schedule List</a>
-                            </div>
-                        </form>
+                                                        @foreach($days as $day)
+                                                            @php
+                                                                $cellKey = $slot['key'] . '|' . $day;
+                                                                $cellSchedules = $schedulesBySlotDay->get($cellKey, collect());
+                                                            @endphp
+                                                            <td>
+                                                                @if($cellSchedules->isNotEmpty())
+                                                                    <div class="schedule-cell">
+                                                                        @foreach($cellSchedules as $schedule)
+                                                                            <button type="button" class="schedule-chip" data-schedule-open="schedule-modal-{{ $schedule->id }}">
+                                                                                <strong>{{ $schedule->subject }}</strong>
+                                                                                <span>{{ $schedule->room }}</span>
+                                                                            </button>
+                                                                        @endforeach
+                                                                    </div>
+                                                                @else
+                                                                    <div class="empty-cell" aria-hidden="true"></div>
+                                                                @endif
+                                                            </td>
+                                                        @endforeach
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+                            </section>
+                        </section>
                     </div>
-                </section>
-
-                <aside class="info-card">
-                    <div class="info-inner">
-                        <div class="info-tag">Entry Guide</div>
-                        <h2>Keep the weekly plan tidy.</h2>
-                        <p>Fill in the class details once and send it straight into your weekly list.</p>
-
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <span>What to add</span>
-                                <strong>Subject, room, day, time, semester, and school year.</strong>
-                            </div>
-
-                            <div class="info-item">
-                                <span>Display flow</span>
-                                <strong>New schedules appear inside the same weekly manager view.</strong>
-                            </div>
-
-                            <div class="info-item">
-                                <span>Built for</span>
-                                <strong>Simple schedule entry without changing your existing workflow.</strong>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-            </section>
+                </div>
+            </main>
         </div>
     </div>
+
+    @foreach($schedules as $schedule)
+        <div id="schedule-modal-{{ $schedule->id }}" class="schedule-modal" aria-hidden="true">
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="schedule-title-{{ $schedule->id }}">
+                <div class="modal-head">
+                    <div>
+                        <span>Schedule Details</span>
+                        <h3 id="schedule-title-{{ $schedule->id }}">{{ $schedule->subject }}</h3>
+                    </div>
+                    <button type="button" class="modal-close" data-schedule-close aria-label="Close schedule details">x</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="modal-details">
+                        <div class="modal-detail">
+                            <span>Day</span>
+                            <strong>{{ $schedule->day_of_week }}</strong>
+                        </div>
+                        <div class="modal-detail">
+                            <span>Time</span>
+                            <strong>{{ $formatTime($schedule->start_time) }} - {{ $formatTime($schedule->end_time) }}</strong>
+                        </div>
+                        <div class="modal-detail">
+                            <span>Room</span>
+                            <strong>{{ $schedule->room }}</strong>
+                        </div>
+                        <div class="modal-detail">
+                            <span>Term</span>
+                            <strong>{{ $schedule->semester }} / {{ $schedule->school_year }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <a href="{{ route('schedules.edit', $schedule) }}" class="primary-button">Edit Schedule</a>
+                        <form method="POST" action="{{ route('schedules.destroy.post', $schedule) }}" class="delete-form">
+                            @csrf
+                            <button type="submit" class="danger-button">Permanently Delete</button>
+                        </form>
+                        <button type="button" class="ghost-button" data-schedule-close>Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    <script>
+        document.querySelectorAll('[data-schedule-open]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const modal = document.getElementById(button.dataset.scheduleOpen);
+
+                if (!modal) {
+                    return;
+                }
+
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+            });
+        });
+
+        function closeScheduleModal(modal) {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        document.querySelectorAll('.schedule-modal').forEach(function (modal) {
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal || event.target.closest('[data-schedule-close]')) {
+                    closeScheduleModal(modal);
+                }
+            });
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape') {
+                return;
+            }
+
+            document.querySelectorAll('.schedule-modal.is-open').forEach(closeScheduleModal);
+        });
+    </script>
 </body>
 </html>

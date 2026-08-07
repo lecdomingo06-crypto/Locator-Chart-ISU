@@ -20,15 +20,16 @@ class PasswordUpdateTest extends TestCase
             ->from('/profile')
             ->put('/password', [
                 'current_password' => 'password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
+                'password' => 'NewPassword1',
+                'password_confirmation' => 'NewPassword1',
             ]);
 
         $response
             ->assertSessionHasNoErrors()
+            ->assertSessionHas('success', 'Password changed successfully.')
             ->assertRedirect('/profile');
 
-        $this->assertTrue(Hash::check('new-password', $user->refresh()->password));
+        $this->assertTrue(Hash::check('NewPassword1', $user->refresh()->password));
     }
 
     public function test_correct_password_must_be_provided_to_update_password(): void
@@ -40,12 +41,52 @@ class PasswordUpdateTest extends TestCase
             ->from('/profile')
             ->put('/password', [
                 'current_password' => 'wrong-password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
+                'password' => 'NewPassword1',
+                'password_confirmation' => 'NewPassword1',
             ]);
 
         $response
             ->assertSessionHasErrorsIn('updatePassword', 'current_password')
             ->assertRedirect('/profile');
+    }
+
+    public function test_common_numeric_password_is_rejected_when_updating_password(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->put('/password', [
+                'current_password' => 'password',
+                'password' => '12345678',
+                'password_confirmation' => '12345678',
+            ]);
+
+        $response
+            ->assertSessionHasErrorsIn('updatePassword', 'password')
+            ->assertRedirect('/profile');
+
+        $this->assertTrue(Hash::check('password', $user->refresh()->password));
+    }
+
+    public function test_all_letter_password_is_rejected_when_updating_password(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->put('/password', [
+                'current_password' => 'password',
+                'password' => 'abcdefgh',
+                'password_confirmation' => 'abcdefgh',
+            ]);
+
+        $response
+            ->assertSessionHasErrorsIn('updatePassword', 'password')
+            ->assertRedirect('/profile');
+
+        $this->assertTrue(Hash::check('password', $user->refresh()->password));
     }
 }

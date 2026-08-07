@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+    <title>{{ config('app.name', 'Professor Tracker') }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
     <style>
@@ -68,6 +68,7 @@
         @media (max-width:960px) { .content { grid-template-columns:1fr; } }
         @media (max-width:720px) { .page { padding:18px; } .topbar { padding:16px 18px; border-radius:24px; flex-direction:column; align-items:flex-start; } .form-card, .info-card { padding:22px; border-radius:28px; } .field-grid { grid-template-columns:1fr; } .form-actions { flex-direction:column; align-items:stretch; } .primary-button, .secondary-link { width:100%; } }
     </style>
+    <x-minimal-ui />
 </head>
 <body>
     <div class="page">
@@ -76,7 +77,7 @@
                 <div class="brand">
                     <div class="brand-mark" aria-hidden="true"></div>
                     <div class="brand-copy">
-                        <strong>Teacher Tracking System</strong>
+                        <strong>Professor Tracking System</strong>
                         <span>Academic event manager</span>
                     </div>
                 </div>
@@ -122,7 +123,7 @@
                                     <select id="scope" name="scope">
                                         <option value="">Select scope</option>
                                         @foreach(\App\Models\AcademicEvent::SCOPE_OPTIONS as $scope)
-                                            <option value="{{ $scope }}" {{ old('scope', $academicEvent->scope) === $scope ? 'selected' : '' }}>{{ $scope === 'all' ? 'All teachers and faculty' : ucfirst($scope) }}</option>
+                                            <option value="{{ $scope }}" {{ old('scope', $academicEvent->scope) === $scope ? 'selected' : '' }}>{{ $scope === 'all' ? 'All professors and faculty' : ucfirst($scope) }}</option>
                                         @endforeach
                                     </select>
                                     @error('scope') <p class="field-error">{{ $message }}</p> @enderror
@@ -151,6 +152,11 @@
                                     <label for="note">Note</label>
                                     <textarea id="note" name="note" placeholder="Add an optional note or description">{{ old('note', $academicEvent->note) }}</textarea>
                                     @error('note') <p class="field-error">{{ $message }}</p> @enderror
+                                </div>
+                                <div class="field full">
+                                    <label for="purpose">Purpose</label>
+                                    <textarea id="purpose" name="purpose" placeholder="Add the purpose shown in the viewer">{{ old('purpose', $academicEvent->purpose) }}</textarea>
+                                    @error('purpose') <p class="field-error">{{ $message }}</p> @enderror
                                 </div>
                             </div>
                             <div class="form-actions">

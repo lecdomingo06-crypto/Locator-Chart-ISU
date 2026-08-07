@@ -11,7 +11,12 @@ class AdminStatusController extends Controller
 {
     public function index()
     {
-        $users = User::whereIn('role', ['teacher', 'faculty'])->get();
+        $users = User::with('department')
+            ->whereIn('role', ['professor', 'faculty'])
+            ->where('is_suspended', false)
+            ->orderBy('full_name')
+            ->get();
+
         return view('admin.status', compact('users'));
     }
 

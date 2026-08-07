@@ -59,13 +59,36 @@ class PasswordResetTest extends TestCase
             $response = $this->post('/reset-password', [
                 'token' => $notification->token,
                 'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => 'Password123',
+                'password_confirmation' => 'Password123',
             ]);
 
             $response
                 ->assertSessionHasNoErrors()
                 ->assertRedirect(route('login'));
+
+            return true;
+        });
+    }
+    public function test_common_numeric_password_is_rejected_when_resetting_password(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        $this->post('/forgot-password', ['email' => $user->email]);
+
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+            $response = $this->from('/reset-password/'.$notification->token)->post('/reset-password', [
+                'token' => $notification->token,
+                'email' => $user->email,
+                'password' => '12345678',
+                'password_confirmation' => '12345678',
+            ]);
+
+            $response
+                ->assertSessionHasErrors('password')
+                ->assertRedirect('/reset-password/'.$notification->token);
 
             return true;
         });

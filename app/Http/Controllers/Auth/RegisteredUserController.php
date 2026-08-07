@@ -20,7 +20,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        $departments = Department::all();
+        $departments = Department::orderBy('name')->get();
 
         return view('auth.register', compact('departments'));
     }
@@ -35,9 +35,9 @@ class RegisteredUserController extends Controller
         $request->validate([
             'full_name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', 'unique:'.User::class],
-            'role' => ['required', 'in:student,teacher,faculty'],
+            'role' => ['required', 'in:professor,faculty'],
             'department_id' => [
-                Rule::requiredIf(fn () => in_array($request->role, ['teacher', 'faculty'], true)),
+                Rule::requiredIf(fn () => in_array($request->role, ['professor', 'faculty'], true)),
                 'nullable',
                 'exists:departments,id',
             ],
@@ -53,6 +53,8 @@ class RegisteredUserController extends Controller
             'department_id' => $request->department_id,
             'password' => Hash::make($request->password),
         ]);
+
+        $user->assignRole($request->role);
 
         return redirect()
             ->route('admin.users.create')

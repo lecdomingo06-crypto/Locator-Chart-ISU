@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+    <title>{{ config('app.name', 'Professor Tracker') }} - Special Schedule</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
@@ -11,18 +11,18 @@
     <style>
         :root {
             color-scheme: light;
-            --bg-top: #eef9f1;
-            --bg-bottom: #dff1e4;
-            --card: rgba(255, 255, 255, 0.84);
-            --card-border: rgba(255, 255, 255, 0.8);
-            --text: #123524;
-            --muted: #5a7261;
+            --bg: #edf7f0;
+            --card: rgba(255, 255, 255, 0.94);
+            --card-border: rgba(12, 92, 56, 0.12);
+            --text: #113322;
+            --muted: #607766;
             --green-900: #0c5c38;
             --green-800: #147247;
-            --green-700: #1d8a54;
-            --shadow: 0 22px 52px rgba(13, 72, 43, 0.12);
+            --green-700: #1b8a53;
+            --green-100: #ddf4e4;
             --danger: #b91c1c;
-            --danger-soft: rgba(254, 226, 226, 0.9);
+            --danger-soft: #fff1f1;
+            --shadow: 0 18px 40px rgba(12, 92, 56, 0.1);
         }
 
         * {
@@ -39,267 +39,332 @@
             font-family: 'Outfit', sans-serif;
             color: var(--text);
             background:
-                radial-gradient(circle at top left, rgba(118, 210, 149, 0.3), transparent 30%),
-                radial-gradient(circle at 82% 18%, rgba(51, 153, 97, 0.22), transparent 18%),
-                linear-gradient(145deg, var(--bg-top), var(--bg-bottom));
+                radial-gradient(circle at top left, rgba(90, 193, 125, 0.24), transparent 22%),
+                radial-gradient(circle at 88% 14%, rgba(32, 153, 90, 0.18), transparent 18%),
+                linear-gradient(180deg, #f7fcf8 0%, var(--bg) 100%);
         }
 
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            z-index: 0;
-            border-radius: 999px;
-            filter: blur(12px);
-            pointer-events: none;
-        }
-
-        body::before {
-            width: 26rem;
-            height: 26rem;
-            top: -8rem;
-            right: -7rem;
-            background: rgba(42, 162, 90, 0.16);
-        }
-
-        body::after {
-            width: 22rem;
-            height: 22rem;
-            left: -6rem;
-            bottom: -8rem;
-            background: rgba(15, 92, 56, 0.1);
-        }
-
-        .page {
-            position: relative;
-            z-index: 1;
+        .workspace-shell {
             min-height: 100vh;
-            padding: 28px;
         }
 
-        .shell {
-            max-width: 1160px;
-            margin: 0 auto;
-            display: grid;
-            gap: 22px;
-        }
-
-        .topbar {
+        .workspace-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 18px;
-            padding: 18px 22px;
-            border-radius: 28px;
-            background: rgba(255, 255, 255, 0.56);
-            border: 1px solid rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(18px);
-            box-shadow: 0 12px 36px rgba(16, 70, 45, 0.08);
+            min-height: 76px;
+            padding: 14px 28px;
+            color: #effcf3;
+            background: linear-gradient(135deg, #094629 0%, #0c5c38 56%, #147247 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 16px 34px rgba(8, 58, 35, 0.2);
         }
 
-        .brand {
+        .workspace-brand,
+        .workspace-session,
+        .workspace-chip,
+        .sidebar-brand,
+        .sidebar-link,
+        .logout-button {
             display: inline-flex;
             align-items: center;
-            gap: 16px;
         }
 
-        .brand-mark {
-            position: relative;
-            width: 54px;
-            height: 54px;
-            border-radius: 18px;
-            background: linear-gradient(160deg, #25a760, #0c5c38);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+        .workspace-brand {
+            gap: 14px;
+            color: inherit;
+            text-decoration: none;
         }
 
-        .brand-mark::before,
-        .brand-mark::after {
-            content: '';
-            position: absolute;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .brand-mark::before {
-            width: 14px;
-            height: 14px;
-            left: 11px;
-            top: 13px;
-            box-shadow: 18px 0 0 rgba(255, 255, 255, 0.95);
-        }
-
-        .brand-mark::after {
-            width: 30px;
-            height: 12px;
-            left: 12px;
-            bottom: 13px;
-            border-radius: 999px 999px 14px 14px;
-        }
-
-        .brand-copy {
+        .workspace-brand-mark,
+        .sidebar-mark {
             display: grid;
-            gap: 4px;
+            place-items: center;
+            border-radius: 8px;
+            font-weight: 800;
         }
 
-        .brand-copy strong {
-            font-size: 1.15rem;
-            letter-spacing: -0.02em;
-        }
-
-        .brand-copy span {
-            color: var(--muted);
-            font-size: 0.95rem;
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            border-radius: 999px;
+        .workspace-brand-mark {
+            width: 48px;
+            height: 48px;
             color: var(--green-900);
-            background: rgba(217, 242, 226, 0.86);
-            border: 1px solid rgba(25, 138, 82, 0.14);
-            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: inset 0 0 0 1px rgba(12, 92, 56, 0.08);
+        }
+
+        .workspace-brand-copy,
+        .sidebar-copy {
+            display: grid;
+            gap: 3px;
+        }
+
+        .workspace-brand-copy strong,
+        .sidebar-copy strong {
+            font-size: 1rem;
+        }
+
+        .workspace-brand-copy span,
+        .sidebar-copy span,
+        .sidebar-note {
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .workspace-brand-copy span {
+            color: rgba(239, 252, 243, 0.76);
             font-weight: 600;
         }
 
-        .status-pill::before {
-            content: '';
-            width: 10px;
-            height: 10px;
-            border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.14);
+        .workspace-session {
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        .content {
+        .workspace-chip {
+            min-height: 34px;
+            padding: 0 13px;
+            border-radius: 999px;
+            color: rgba(239, 252, 243, 0.95);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 0.86rem;
+            font-weight: 700;
+        }
+
+        .logout-form {
+            margin: 0;
+        }
+
+        .logout-button {
+            justify-content: center;
+            min-height: 38px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 999px;
+            color: var(--green-900);
+            background: #ffffff;
+            font-size: 0.86rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 12px 22px rgba(5, 51, 30, 0.16);
+        }
+
+        .workspace-layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
-            gap: 24px;
+            grid-template-columns: 244px minmax(0, 1fr);
+            gap: 26px;
             align-items: start;
         }
 
-        .form-card,
-        .info-card {
-            position: relative;
-            overflow: hidden;
-            border-radius: 32px;
+        .workspace-sidebar {
+            position: sticky;
+            top: 94px;
+            min-height: calc(100vh - 112px);
+            margin-left: 16px;
+            padding: 18px 14px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--card-border);
+            border-left: 0;
+            border-radius: 0 8px 8px 0;
             box-shadow: var(--shadow);
         }
 
-        .form-card {
-            padding: 30px;
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            backdrop-filter: blur(16px);
+        .sidebar-brand {
+            gap: 12px;
+            padding: 0 0 18px;
+            border-bottom: 1px solid rgba(12, 92, 56, 0.1);
         }
 
-        .form-card::before {
-            content: '';
-            position: absolute;
-            left: -8%;
-            bottom: -14%;
-            width: 20rem;
-            height: 20rem;
-            border-radius: 46% 54% 58% 42%;
-            background: linear-gradient(180deg, rgba(29, 138, 87, 0.14), rgba(12, 92, 56, 0.04));
+        .sidebar-mark {
+            flex: 0 0 54px;
+            width: 54px;
+            height: 54px;
+            color: #ffffff;
+            background: linear-gradient(145deg, var(--green-800), var(--green-900));
         }
 
-        .form-inner,
-        .info-inner {
-            position: relative;
-            z-index: 1;
+        .sidebar-copy span,
+        .sidebar-note {
+            color: var(--muted);
+        }
+
+        .sidebar-note {
+            margin: 14px 0 18px;
+        }
+
+        .sidebar-section-label {
+            display: block;
+            margin: 0 0 10px;
+            color: #6c7d70;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
             display: grid;
-            gap: 20px;
+            gap: 8px;
         }
 
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            width: fit-content;
-            padding: 10px 16px;
-            border-radius: 999px;
-            background: rgba(12, 92, 56, 0.08);
+        .sidebar-link {
+            gap: 11px;
+            min-height: 44px;
+            padding: 0 12px;
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        .sidebar-link svg {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .sidebar-link:hover {
             color: var(--green-900);
-            font-size: 0.84rem;
-            font-weight: 700;
+            background: var(--green-100);
+        }
+
+        .sidebar-link.is-active {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--green-800), var(--green-900));
+            box-shadow: 0 12px 24px rgba(12, 92, 56, 0.16);
+        }
+
+        .workspace-main .page {
+            padding: 24px 28px 32px 0;
+        }
+
+        .shell {
+            display: grid;
+            gap: 18px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 2px 2px 0;
+        }
+
+        .title-copy {
+            display: grid;
+            gap: 6px;
+        }
+
+        .title-copy span,
+        .panel-head span,
+        .self-label {
+            color: var(--green-800);
+            font-size: 0.78rem;
+            font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
-        .eyebrow::before {
-            content: '';
-            width: 28px;
-            height: 1px;
-            background: rgba(12, 92, 56, 0.32);
-        }
-
-        h1 {
+        .title-copy h1,
+        .panel-head h2 {
             margin: 0;
-            font-size: clamp(2.2rem, 4vw, 3.4rem);
-            line-height: 0.98;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.03em;
         }
 
-        .intro {
-            margin: 0;
-            max-width: 48ch;
-            color: var(--muted);
-            font-size: 1rem;
-            line-height: 1.75;
+        .title-copy h1 {
+            font-size: 1.45rem;
         }
 
-        .error-summary {
+        .title-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            color: var(--green-900);
+            background: rgba(221, 244, 228, 0.8);
+            border: 1px solid rgba(20, 114, 71, 0.1);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .content-grid {
             display: grid;
-            gap: 8px;
-            padding: 16px 18px;
+            grid-template-columns: minmax(350px, 0.82fr) minmax(0, 1.18fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .form-panel,
+        .self-viewer {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
             border-radius: 20px;
-            color: #7f1d1d;
-            background: var(--danger-soft);
-            border: 1px solid rgba(185, 28, 28, 0.14);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 251, 246, 0.96));
+            box-shadow: var(--shadow);
         }
 
-        .error-summary strong {
-            font-size: 0.98rem;
+        .form-panel::before,
+        .self-viewer::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--green-900), var(--green-700));
         }
 
-        .error-summary ul {
-            margin: 0;
-            padding-left: 18px;
+        .form-panel,
+        .self-viewer {
+            padding: 20px;
+        }
+
+        .panel-head {
             display: grid;
-            gap: 4px;
+            gap: 6px;
+            margin-bottom: 18px;
+        }
+
+        .panel-head h2 {
+            font-size: 1.25rem;
         }
 
         .schedule-form {
             display: grid;
-            gap: 18px;
+            gap: 14px;
         }
 
         .field-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-        }
-
-        .field {
-            display: grid;
-            gap: 8px;
+            gap: 12px;
         }
 
         .field.full {
             grid-column: 1 / -1;
         }
 
-        .field[hidden] {
-            display: none !important;
+        .field {
+            display: grid;
+            gap: 8px;
+            min-width: 0;
         }
 
         .field label {
             color: var(--green-900);
-            font-size: 0.82rem;
-            font-weight: 700;
+            font-size: 0.78rem;
+            font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
@@ -308,77 +373,90 @@
         .field select,
         .field textarea {
             width: 100%;
-            min-height: 56px;
-            padding: 14px 18px;
-            border: 1px solid rgba(18, 53, 36, 0.12);
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.92);
+            min-height: 44px;
+            padding: 0 13px;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
             color: var(--text);
+            background: rgba(255, 255, 255, 0.96);
             font: inherit;
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+            outline: none;
         }
 
         .field textarea {
-            min-height: 138px;
+            min-height: 112px;
+            padding: 12px 13px;
             resize: vertical;
         }
 
         .field input:focus,
         .field select:focus,
         .field textarea:focus {
-            outline: none;
-            border-color: rgba(20, 114, 71, 0.44);
-            box-shadow: 0 0 0 4px rgba(29, 138, 84, 0.12);
+            border-color: rgba(20, 114, 71, 0.42);
+            box-shadow: 0 0 0 4px rgba(20, 114, 71, 0.12);
         }
 
         .field-error {
             margin: 0;
             color: var(--danger);
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .error-summary {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 14px;
+            border-radius: 14px;
+            color: var(--danger);
+            background: var(--danger-soft);
+            border: 1px solid rgba(185, 28, 28, 0.14);
+            font-weight: 700;
+        }
+
+        .error-summary ul {
+            margin: 0;
+            padding-left: 18px;
         }
 
         .toggle-field {
             display: flex;
             align-items: flex-start;
-            gap: 14px;
-            padding: 18px;
-            border: 1px solid rgba(18, 53, 36, 0.12);
-            border-radius: 20px;
-            background: rgba(232, 245, 236, 0.56);
+            gap: 12px;
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(221, 244, 228, 0.52);
+            border: 1px solid rgba(20, 114, 71, 0.1);
+            cursor: pointer;
         }
 
-        .toggle-field input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-top: 2px;
+        .toggle-field input {
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
             accent-color: var(--green-800);
-            flex: 0 0 auto;
         }
 
         .toggle-copy {
             display: grid;
-            gap: 6px;
+            gap: 4px;
         }
 
         .toggle-copy strong {
-            font-size: 0.98rem;
-            letter-spacing: -0.02em;
+            color: var(--text);
         }
 
         .toggle-copy span {
             color: var(--muted);
-            font-size: 0.94rem;
-            line-height: 1.6;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         .form-actions {
             display: flex;
-            gap: 14px;
             flex-wrap: wrap;
-            align-items: center;
-            padding-top: 6px;
+            gap: 10px;
         }
 
         .primary-button,
@@ -386,160 +464,268 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 52px;
-            padding: 0 22px;
-            border-radius: 18px;
+            min-height: 44px;
+            padding: 0 16px;
+            border-radius: 12px;
             font: inherit;
-            font-weight: 700;
+            font-size: 0.86rem;
+            font-weight: 800;
             text-decoration: none;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            cursor: pointer;
         }
 
         .primary-button {
-            border: none;
-            color: #fff;
-            cursor: pointer;
+            border: 0;
+            color: #ffffff;
             background: linear-gradient(135deg, var(--green-800), var(--green-900));
-            box-shadow: 0 18px 30px rgba(12, 92, 56, 0.22);
+            box-shadow: 0 14px 28px rgba(20, 114, 71, 0.2);
         }
 
         .secondary-link {
             color: var(--green-900);
-            background: rgba(255, 255, 255, 0.82);
-            border: 1px solid rgba(12, 92, 56, 0.14);
-            box-shadow: 0 12px 24px rgba(14, 76, 46, 0.08);
+            background: rgba(221, 244, 228, 0.72);
+            border: 1px solid rgba(20, 114, 71, 0.16);
         }
 
-        .primary-button:hover,
-        .secondary-link:hover {
-            transform: translateY(-2px);
+        .self-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            min-width: 0;
         }
 
-        .info-card {
-            padding: 26px;
-            color: #eefcf2;
-            background:
-                radial-gradient(circle at top right, rgba(74, 222, 128, 0.24), transparent 28%),
-                linear-gradient(180deg, #156941 0%, #0c5434 55%, #083924 100%);
-        }
-
-        .info-card::before,
-        .info-card::after {
-            content: '';
-            position: absolute;
-            border-radius: 999px;
-            pointer-events: none;
-        }
-
-        .info-card::before {
-            width: 16rem;
-            height: 16rem;
-            top: -6rem;
-            right: -4rem;
-            background: rgba(219, 255, 228, 0.12);
-        }
-
-        .info-card::after {
-            width: 14rem;
-            height: 14rem;
-            left: -4rem;
-            bottom: -5rem;
-            background: rgba(180, 250, 200, 0.08);
-        }
-
-        .info-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            width: fit-content;
-            padding: 9px 14px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.84rem;
-            font-weight: 700;
-        }
-
-        .info-tag::before {
-            content: '';
-            width: 9px;
-            height: 9px;
-            border-radius: 999px;
-            background: #4ade80;
-        }
-
-        .info-card h2 {
-            margin: 0;
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            line-height: 1;
-            letter-spacing: -0.04em;
-        }
-
-        .info-card p {
-            margin: 0;
-            color: rgba(238, 252, 242, 0.78);
-            line-height: 1.72;
-        }
-
-        .info-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .info-item {
-            padding: 16px;
+        .self-photo,
+        .self-placeholder {
+            flex: 0 0 86px;
+            width: 86px;
+            height: 86px;
             border-radius: 18px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 2px solid rgba(20, 114, 71, 0.08);
         }
 
-        .info-item span {
+        .self-photo {
+            object-fit: cover;
+        }
+
+        .self-placeholder {
+            display: grid;
+            place-items: center;
+            color: var(--green-900);
+            background: var(--green-100);
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .self-copy {
+            display: grid;
+            gap: 5px;
+            min-width: 0;
+        }
+
+        .self-copy h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            letter-spacing: -0.03em;
+        }
+
+        .self-copy p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .status-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(232, 245, 236, 0.55);
+            border: 1px solid rgba(20, 114, 71, 0.08);
+        }
+
+        .status-card span {
             display: block;
-            color: rgba(238, 252, 242, 0.66);
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
-        .info-item strong {
+        .status-card strong {
             display: block;
-            margin-top: 8px;
-            font-size: 1rem;
-            line-height: 1.55;
+            margin-top: 6px;
         }
 
-        @media (max-width: 960px) {
-            .content {
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            min-width: 118px;
+            max-width: 150px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            color: #ffffff;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .self-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .self-tile {
+            min-width: 0;
+            min-height: 82px;
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(221, 244, 228, 0.52);
+            border: 1px solid rgba(20, 114, 71, 0.1);
+        }
+
+        .self-tile span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .self-tile strong {
+            display: block;
+            margin-top: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .context-card {
+            display: grid;
+            gap: 8px;
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid rgba(20, 114, 71, 0.1);
+        }
+
+        .context-card span {
+            color: var(--green-800);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .context-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            color: var(--text);
+            font-size: 0.92rem;
+        }
+
+        .context-line small {
+            flex: 0 0 auto;
+            color: var(--muted);
+            font-size: inherit;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1180px) {
+            .content-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .workspace-topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .workspace-session {
+                justify-content: flex-start;
+            }
+
+            .workspace-layout {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .workspace-sidebar {
+                position: static;
+                min-height: 0;
+                margin: 16px 16px 0;
+                border-left: 1px solid var(--card-border);
+                border-radius: 8px;
+            }
+
+            .sidebar-nav {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+
+            .workspace-main .page {
+                padding: 0 16px 24px;
             }
         }
 
         @media (max-width: 720px) {
-            .page {
-                padding: 18px;
+            .workspace-topbar {
+                padding: 14px 16px;
             }
 
-            .topbar {
-                padding: 16px 18px;
-                border-radius: 24px;
-                flex-direction: column;
-                align-items: flex-start;
+            .workspace-brand-copy span {
+                display: none;
             }
 
-            .form-card,
-            .info-card {
-                padding: 22px;
-                border-radius: 28px;
+            .workspace-session,
+            .workspace-chip,
+            .logout-form,
+            .logout-button {
+                width: 100%;
             }
 
-            .field-grid {
+            .workspace-sidebar {
+                margin: 14px 14px 0;
+                padding: 16px;
+            }
+
+            .sidebar-nav,
+            .field-grid,
+            .self-grid {
                 grid-template-columns: 1fr;
             }
 
-            .form-actions {
+            .workspace-main .page {
+                padding: 0 14px 20px;
+            }
+
+            .page-title,
+            .self-head,
+            .status-card,
+            .context-line {
+                align-items: flex-start;
                 flex-direction: column;
-                align-items: stretch;
+            }
+
+            .form-panel,
+            .self-viewer {
+                padding: 16px;
+                border-radius: 18px;
             }
 
             .primary-button,
@@ -548,147 +734,308 @@
             }
         }
     </style>
+    <x-minimal-ui />
 </head>
 <body>
-    <div class="page">
-        <div class="shell">
-            <section class="topbar">
-                <div class="brand">
-                    <div class="brand-mark" aria-hidden="true"></div>
-                    <div class="brand-copy">
-                        <strong>Teacher Tracking System</strong>
-                        <span>Special schedule manager</span>
+@php
+    $user = auth()->user();
+    $displayName = $user->full_name ?: $user->username;
+    $departmentName = $user->department->name ?? 'No department assigned';
+    $statusData = $user->live_status;
+    $status = $statusData['status'];
+    $statusPalette = [
+        'Available' => '#16a34a',
+        'In Class' => '#2563eb',
+        'On Leave' => '#dc2626',
+        'Emergency' => '#f59e0b',
+        'On Meeting' => '#7c3aed',
+        'On Break' => '#d97706',
+        'Not Available' => '#6b7280',
+        'Holiday' => '#d97706',
+        'Class Suspension' => '#dc2626',
+        'No Classes' => '#0891b2',
+        'University Event' => '#0f766e',
+        'Department Activity' => '#7c3aed',
+    ];
+    $paletteKey = ($statusData['source'] ?? null) === 'academic_event'
+        ? ($statusData['event_type'] ?? $status)
+        : $status;
+    $badgeColor = $statusPalette[$paletteKey] ?? '#6b7280';
+    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag;
+@endphp
+
+    <div class="workspace-shell">
+        <header class="workspace-topbar">
+            <a href="{{ route('staff.viewer') }}" class="workspace-brand">
+                <div class="workspace-brand-mark" aria-hidden="true"><img src="{{ asset('images/isulogo.jpg') }}" alt=""></div>
+                <div class="workspace-brand-copy">
+                    <strong>Professor Tracking System</strong>
+                    <span>{{ ucfirst($user->role) }} workspace</span>
+                </div>
+            </a>
+
+            <div class="workspace-session">
+                <span class="workspace-chip">Role: {{ ucfirst($user->role) }}</span>
+                <span class="workspace-chip">Signed in as {{ $displayName }}</span>
+            </div>
+        </header>
+
+        <div class="workspace-layout">
+            <aside class="workspace-sidebar">
+                <div class="sidebar-brand">
+                    <div class="sidebar-mark" aria-hidden="true"><img src="{{ asset('images/isulogo.jpg') }}" alt=""></div>
+                    <div class="sidebar-copy">
+                        <strong>{{ ucfirst($user->role) }} Panel</strong>
+                        <span>Status and schedule tools</span>
                     </div>
                 </div>
 
-                <div class="status-pill">Create special entry</div>
-            </section>
+                <p class="sidebar-note">Create temporary status updates and review your current viewer status.</p>
 
-            <section class="content">
-                <section class="form-card">
-                    <div class="form-inner">
-                        <div class="eyebrow">Special Schedule</div>
-                        <h1>Add Special Schedule</h1>
-                        <p class="intro">Create a temporary availability update, exception, or one-off schedule change in the same clean green style.</p>
+                <span class="sidebar-section-label">Workspace</span>
+                <nav class="sidebar-nav" aria-label="{{ ucfirst($user->role) }} workspace">
+                    <a href="{{ route('staff.viewer') }}" class="sidebar-link{{ request()->routeIs('staff.viewer') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"></path>
+                            <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6Z"></path>
+                        </svg>
+                        <span>Live Viewer</span>
+                    </a>
 
-                        @if($errors->any())
-                            <section class="error-summary" aria-label="Validation errors">
-                                <strong>Please review the highlighted schedule details.</strong>
-                                <ul>
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </section>
-                        @endif
+                    <a href="{{ route('attendance.show') }}" class="sidebar-link{{ request()->routeIs('attendance.*') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <path d="M12 7v5l3 2"></path>
+                        </svg>
+                        <span>Attendance</span>
+                    </a>
+                    <a href="{{ route('availability.show') }}" class="sidebar-link{{ request()->routeIs('availability.*') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 2v4"></path>
+                            <path d="M12 18v4"></path>
+                            <path d="M4.9 4.9l2.8 2.8"></path>
+                            <path d="M16.3 16.3l2.8 2.8"></path>
+                            <path d="M2 12h4"></path>
+                            <path d="M18 12h4"></path>
+                            <path d="M4.9 19.1l2.8-2.8"></path>
+                            <path d="M16.3 7.7l2.8-2.8"></path>
+                        </svg>
+                        <span>Availability</span>
+                    </a>
 
-                        <form method="POST" action="{{ route('special_schedules.store') }}" class="schedule-form">
-                            @csrf
+                    <a href="{{ route('profile.edit') }}" class="sidebar-link{{ request()->routeIs('profile.edit') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z"></path>
+                            <path d="M4.5 20c.8-3.8 3.4-5.8 7.5-5.8s6.7 2 7.5 5.8"></path>
+                        </svg>
+                        <span>Profile</span>
+                    </a>
 
-                            <div class="field-grid">
-                                <div class="field full">
-                                    <label for="type">Type</label>
-                                    <select id="type" name="type">
-                                        <option value="">Select Type</option>
-                                        <option value="On Leave" {{ old('type') == 'On Leave' ? 'selected' : '' }}>On Leave</option>
-                                        <option value="Emergency" {{ old('type') == 'Emergency' ? 'selected' : '' }}>Emergency</option>
-                                        <option value="On Meeting" {{ old('type') == 'On Meeting' ? 'selected' : '' }}>On Meeting</option>
-                                    </select>
-                                    @error('type')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
+                    @if($user->role === 'professor')
+                        <a href="{{ route('schedules.create') }}" class="sidebar-link{{ request()->routeIs('schedules.*') ? ' is-active' : '' }}">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 3v4"></path>
+                                <path d="M17 3v4"></path>
+                                <path d="M4 8h16"></path>
+                                <path d="M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"></path>
+                                <path d="M8 13h8"></path>
+                                <path d="M8 17h5"></path>
+                            </svg>
+                            <span>Weekly Schedule</span>
+                        </a>
+                    @endif
+
+                    <a href="{{ route('special_schedules.create') }}" class="sidebar-link{{ request()->routeIs('special_schedules.*') ? ' is-active' : '' }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 6l1.6 4.4L18 12l-4.4 1.6L12 18l-1.6-4.4L6 12l4.4-1.6L12 6Z"></path>
+                            <path d="M19 4v4"></path>
+                            <path d="M21 6h-4"></path>
+                        </svg>
+                        <span>Special Schedule</span>
+                    </a>
+                </nav>
+            <x-sidebar-account-footer />
+            </aside>
+<x-responsive-sidebar-control />
+
+            <main class="workspace-main">
+                <div class="page">
+                    <div class="shell">
+                        <section class="page-title" aria-label="Special schedule title">
+                            <div class="title-copy">
+                                <span>Special Schedule</span>
+                                <h1>Create Special Entry</h1>
+                            </div>
+
+                            <div class="title-pill">Self status viewer</div>
+                        </section>
+
+                        <x-flash-toast />
+
+                        <section class="content-grid">
+                            <section class="form-panel">
+                                <div class="panel-head">
+                                    <span>Add Special Schedule</span>
+                                    <h2>Temporary Status Details</h2>
                                 </div>
 
-                                <div class="field">
-                                    <label for="start_datetime">Start Date &amp; Time</label>
-                                    <input id="start_datetime" type="datetime-local" name="start_datetime" value="{{ old('start_datetime') }}">
-                                    @error('start_datetime')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                                @if($errors->any())
+                                    <section class="error-summary" aria-label="Validation errors">
+                                        <strong>Please review the highlighted schedule details.</strong>
+                                        <ul>
+                                            @foreach($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </section>
+                                @endif
 
-                                <div class="field">
-                                    <label for="end_datetime">End Date &amp; Time</label>
-                                    <input id="end_datetime" type="datetime-local" name="end_datetime" value="{{ old('end_datetime') }}">
-                                    @error('end_datetime')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                                <form method="POST" action="{{ route('special_schedules.store') }}" class="schedule-form">
+                                    @csrf
 
-                                <div class="field full">
-                                    <label for="note">Note / Reason</label>
-                                    <textarea id="note" name="note" placeholder="Add a short reason or context">{{ old('note') }}</textarea>
-                                    @error('note')
-                                        <p class="field-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                                    <div class="field-grid">
+                                        <div class="field full">
+                                            <label for="type">Type</label>
+                                            <select id="type" name="type">
+                                                <option value="">Select type</option>
+                                                <option value="On Leave" {{ old('type') === 'On Leave' ? 'selected' : '' }}>On Leave</option>
+                                                <option value="Emergency" {{ old('type') === 'Emergency' ? 'selected' : '' }}>Emergency</option>
+                                                <option value="On Meeting" {{ old('type') === 'On Meeting' ? 'selected' : '' }}>On Meeting</option>
+                                            </select>
+                                            @error('type')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
 
-                                @if(auth()->user()->role === 'teacher')
-                                    <div
-                                        id="keep_until_schedule_end_field"
-                                        class="field full"
-                                        style="{{ old('type') === 'On Meeting' ? '' : 'display: none;' }}"
-                                        {{ old('type') === 'On Meeting' ? '' : 'hidden' }}>
-                                        <label for="keep_until_schedule_end">If you will also miss the rest of your class</label>
-                                        <label class="toggle-field" for="keep_until_schedule_end">
-                                            <input
-                                                id="keep_until_schedule_end"
-                                                type="checkbox"
-                                                name="keep_until_schedule_end"
-                                                value="1"
-                                                {{ old('keep_until_schedule_end') ? 'checked' : '' }}>
-                                            <div class="toggle-copy">
-                                                <strong>Keep this status until the current class period ends</strong>
-                                                <span>Turn this on if you will not return to class after this meeting. If it overlaps your current class period, the system will extend the end time to the class end instead of switching back to <code>In Class</code>.</span>
+                                        <div class="field">
+                                            <label for="start_datetime">Start Date &amp; Time</label>
+                                            <input id="start_datetime" type="datetime-local" name="start_datetime" value="{{ old('start_datetime') }}">
+                                            @error('start_datetime')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="field">
+                                            <label for="end_datetime">End Date &amp; Time</label>
+                                            <input id="end_datetime" type="datetime-local" name="end_datetime" value="{{ old('end_datetime') }}">
+                                            @error('end_datetime')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="field full">
+                                            <label for="note">Note / Reason</label>
+                                            <textarea id="note" name="note" placeholder="Add a short reason or context">{{ old('note') }}</textarea>
+                                            @error('note')
+                                                <p class="field-error">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        @if($user->role === 'professor')
+                                            <div
+                                                id="keep_until_schedule_end_field"
+                                                class="field full"
+                                                style="{{ old('type') === 'On Meeting' ? '' : 'display: none;' }}"
+                                                {{ old('type') === 'On Meeting' ? '' : 'hidden' }}>
+                                                <label for="keep_until_schedule_end">If you will also miss the rest of your class</label>
+                                                <label class="toggle-field" for="keep_until_schedule_end">
+                                                    <input
+                                                        id="keep_until_schedule_end"
+                                                        type="checkbox"
+                                                        name="keep_until_schedule_end"
+                                                        value="1"
+                                                        {{ old('keep_until_schedule_end') ? 'checked' : '' }}>
+                                                    <div class="toggle-copy">
+                                                        <strong>Keep this status until the current class period ends</strong>
+                                                        <span>Use this when a meeting continues through the rest of the current class period.</span>
+                                                    </div>
+                                                </label>
+                                                @error('keep_until_schedule_end')
+                                                    <p class="field-error">{{ $message }}</p>
+                                                @enderror
                                             </div>
-                                        </label>
-                                        @error('keep_until_schedule_end')
-                                            <p class="field-error">{{ $message }}</p>
-                                        @enderror
+                                        @endif
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="submit" class="primary-button">Save Special Schedule</button>
+                                    </div>
+                                </form>
+                            </section>
+
+                            <aside class="self-viewer">
+                                <div class="self-head">
+                                    @if($user->profile_picture)
+                                        <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile picture of {{ $displayName }}" class="self-photo">
+                                    @else
+                                        <div class="self-placeholder" aria-hidden="true">{{ strtoupper(substr($displayName ?? 'U', 0, 1)) }}</div>
+                                    @endif
+
+                                    <div class="self-copy">
+                                        <span class="self-label">Self Viewer</span>
+                                        <h2>{{ $displayName }}</h2>
+                                        <p>{{ ucfirst($user->role) }} availability profile</p>
+                                    </div>
+                                </div>
+
+                                <div class="status-card">
+                                    <div>
+                                        <span>Current Status</span>
+                                        <strong>Real-time availability</strong>
+                                    </div>
+
+                                    <div class="status-badge" style="background-color: {{ $badgeColor }};">
+                                        {{ $status }}
+                                    </div>
+                                </div>
+
+                                <div class="self-grid">
+                                    <div class="self-tile">
+                                        <span>Role</span>
+                                        <strong>{{ ucfirst($user->role) }}</strong>
+                                    </div>
+
+                                    <div class="self-tile">
+                                        <span>Department</span>
+                                        <strong>{{ $departmentName }}</strong>
+                                    </div>
+
+                                    <div class="self-tile">
+                                        <span>Username</span>
+                                        <strong>{{ $user->username }}</strong>
+                                    </div>
+
+                                    <div class="self-tile">
+                                        <span>Status Source</span>
+                                        <strong>{{ ucwords(str_replace('_', ' ', $statusData['source'] ?? 'live status')) }}</strong>
+                                    </div>
+                                </div>
+
+                                @if(!empty($statusData['subject']) || !empty($statusData['room']) || !empty($statusData['event_type']) || !empty($statusData['event_note']) || !empty($statusData['event_purpose']))
+                                    <div class="context-card">
+                                        <span>Status Context</span>
+                                        @if(!empty($statusData['subject']))
+                                            <div class="context-line"><small>Subject</small><strong>{{ $statusData['subject'] }}</strong></div>
+                                        @endif
+                                        @if(!empty($statusData['room']))
+                                            <div class="context-line"><small>Room</small><strong>{{ $statusData['room'] }}</strong></div>
+                                        @endif
+                                        @if(!empty($statusData['event_type']))
+                                            <div class="context-line"><small>Event</small><strong>{{ $statusData['event_type'] }}</strong></div>
+                                        @endif
+                                        @if(!empty($statusData['event_note']))
+                                            <div class="context-line"><small>Note</small><strong>{{ $statusData['event_note'] }}</strong></div>
+                                        @endif
+                                        @if(!empty($statusData['event_purpose']))
+                                            <div class="context-line"><small>Purpose</small><strong>{{ $statusData['event_purpose'] }}</strong></div>
+                                        @endif
                                     </div>
                                 @endif
-                            </div>
-
-                            <div class="form-actions">
-                                <button type="submit" class="primary-button">Save Special Schedule</button>
-                                <a href="{{ route('special_schedules.index') }}" class="secondary-link">Back to Special Schedules</a>
-                            </div>
-                        </form>
+                            </aside>
+                        </section>
                     </div>
-                </section>
-
-                <aside class="info-card">
-                    <div class="info-inner">
-                        <div class="info-tag">Entry Guide</div>
-                        <h2>Handle exceptions clearly.</h2>
-                        <p>Use this form to record short-term changes without changing your regular weekly schedule.</p>
-
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <span>Common types</span>
-                                <strong>On Leave, Emergency, or On Meeting.</strong>
-                            </div>
-
-                            <div class="info-item">
-                                <span>Time range</span>
-                                <strong>Set the exact start and end date and time for the special entry.</strong>
-                            </div>
-
-                            <div class="info-item">
-                                <span>Extra note</span>
-                                <strong>Add a short reason so the entry is easier to understand later.</strong>
-                            </div>
-
-                            @if(auth()->user()->role === 'teacher')
-                                <div class="info-item">
-                                    <span>Missed class</span>
-                                    <strong>Use the extra option when the teacher will also be absent for the remaining part of the current class period.</strong>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </aside>
-            </section>
+                </div>
+            </main>
         </div>
     </div>
 

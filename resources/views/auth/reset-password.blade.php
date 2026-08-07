@@ -3,7 +3,7 @@
         <div class="auth-heading">
             <div class="auth-eyebrow">Set New Password</div>
             <h1 class="auth-title">Create a new password</h1>
-            <p class="auth-copy">Choose a secure new password to restore access to your teacher tracking account.</p>
+            <p class="auth-copy">Choose a secure new password to restore access to your professor tracking account.</p>
         </div>
 
         <form method="POST" action="{{ route('password.store') }}" class="auth-form-grid">

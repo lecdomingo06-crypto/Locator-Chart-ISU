@@ -27,7 +27,19 @@ class RegistrationTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_admins_can_create_student_accounts_without_losing_their_session(): void
+    public function test_admin_account_creation_screen_uses_the_admin_sidebar_with_attendance(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->get(route('admin.users.create'));
+
+        $response
+            ->assertOk()
+            ->assertSee('Attendance')
+            ->assertSee(route('admin.attendance.index'), false);
+    }
+
+    public function test_admins_cannot_create_student_accounts(): void
     {
         $admin = User::factory()->create([
             'role' => 'admin',
@@ -36,29 +48,27 @@ class RegistrationTest extends TestCase
 
         $response = $this
             ->actingAs($admin)
+            ->from(route('admin.users.create'))
             ->post(route('admin.users.store'), [
                 'full_name' => 'Student Demo',
                 'username' => 'student_demo',
                 'role' => 'student',
                 'department_id' => null,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => 'Password123',
+                'password_confirmation' => 'Password123',
             ]);
 
         $response
-            ->assertSessionHasNoErrors()
+            ->assertSessionHasErrors('role')
             ->assertRedirect(route('admin.users.create'));
 
         $this->assertAuthenticatedAs($admin);
-        $this->assertDatabaseHas('users', [
-            'full_name' => 'Student Demo',
+        $this->assertDatabaseMissing('users', [
             'username' => 'student_demo',
-            'role' => 'student',
-            'email' => 'student_demo@local.test',
         ]);
     }
 
-    public function test_teacher_and_faculty_accounts_still_require_a_department(): void
+    public function test_professor_and_faculty_accounts_still_require_a_department(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
 
@@ -70,8 +80,8 @@ class RegistrationTest extends TestCase
                 'username' => 'faculty_demo',
                 'role' => 'faculty',
                 'department_id' => null,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => 'Password123',
+                'password_confirmation' => 'Password123',
             ]);
 
         $response
@@ -79,7 +89,7 @@ class RegistrationTest extends TestCase
             ->assertRedirect(route('admin.users.create'));
     }
 
-    public function test_admins_can_create_teacher_accounts_with_a_department(): void
+    public function test_admins_can_create_professor_accounts_with_a_department(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $department = Department::create(['name' => 'Computer Science']);
@@ -87,12 +97,12 @@ class RegistrationTest extends TestCase
         $response = $this
             ->actingAs($admin)
             ->post(route('admin.users.store'), [
-                'full_name' => 'Teacher Demo',
-                'username' => 'teacher_demo',
-                'role' => 'teacher',
+                'full_name' => 'Professor Demo',
+                'username' => 'professor_demo',
+                'role' => 'professor',
                 'department_id' => $department->id,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => 'Password123',
+                'password_confirmation' => 'Password123',
             ]);
 
         $response
@@ -100,10 +110,59 @@ class RegistrationTest extends TestCase
             ->assertRedirect(route('admin.users.create'));
 
         $this->assertDatabaseHas('users', [
-            'full_name' => 'Teacher Demo',
-            'username' => 'teacher_demo',
-            'role' => 'teacher',
+            'full_name' => 'Professor Demo',
+            'username' => 'professor_demo',
+            'role' => 'professor',
             'department_id' => $department->id,
+        ]);
+    }
+    public function test_admin_cannot_create_account_with_common_numeric_password(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $department = Department::create(['name' => 'Business Administration']);
+
+        $response = $this
+            ->actingAs($admin)
+            ->from(route('admin.users.create'))
+            ->post(route('admin.users.store'), [
+                'full_name' => 'Weak Password Professor',
+                'username' => 'weak_password_professor',
+                'role' => 'professor',
+                'department_id' => $department->id,
+                'password' => '12345678',
+                'password_confirmation' => '12345678',
+            ]);
+
+        $response
+            ->assertSessionHasErrors('password')
+            ->assertRedirect(route('admin.users.create'));
+
+        $this->assertDatabaseMissing('users', [
+            'username' => 'weak_password_professor',
+        ]);
+    }
+
+    public function test_student_registration_rejects_common_numeric_password(): void
+    {
+        $department = Department::create(['name' => 'Education']);
+
+        $response = $this
+            ->from(route('student.register'))
+            ->post(route('student.register.store'), [
+                'student_id' => '2026-12345',
+                'full_name' => 'Weak Password Student',
+                'email' => 'weak.student@example.test',
+                'department_id' => $department->id,
+                'password' => '12345678',
+                'password_confirmation' => '12345678',
+            ]);
+
+        $response
+            ->assertSessionHasErrors('password')
+            ->assertRedirect(route('student.register'));
+
+        $this->assertDatabaseMissing('pending_student_registrations', [
+            'student_id' => '2026-12345',
         ]);
     }
 }

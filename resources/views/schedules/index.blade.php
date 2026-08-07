@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Teacher Tracker') }}</title>
+    <title>{{ config('app.name', 'Professor Tracker') }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=outfit:300,400,500,600,700,800" rel="stylesheet" />
@@ -688,6 +688,7 @@
             }
         }
     </style>
+    <x-minimal-ui />
 </head>
 <body>
     <div class="page">
@@ -696,7 +697,7 @@
                 <div class="brand">
                     <div class="brand-mark" aria-hidden="true"></div>
                     <div class="brand-copy">
-                        <strong>Teacher Tracking System</strong>
+                        <strong>Professor Tracking System</strong>
                         <span>Weekly teaching schedule manager</span>
                     </div>
                 </div>
@@ -713,13 +714,11 @@
                             Review your classes in a cleaner weekly view and manage new entries from one focused page.
                         </p>
 
-                        @if(session('success'))
-                            <div class="success-alert">{{ session('success') }}</div>
-                        @endif
+                        <x-flash-toast />
 
                         <div class="hero-actions">
                             <a href="{{ route('schedules.create') }}" class="primary-link">Add Schedule</a>
-                            <a href="{{ route('teacher.dashboard') }}" class="secondary-link">Back to Teacher Dashboard</a>
+                            <a href="{{ route('professor.dashboard') }}" class="secondary-link">Back to Professor Dashboard</a>
                         </div>
                     </div>
                 </section>
@@ -802,9 +801,8 @@
                         <div class="card-actions">
                             <a href="{{ route('schedules.edit', $schedule) }}" class="edit-link">Edit</a>
 
-                            <form method="POST" action="{{ route('schedules.destroy', $schedule) }}" class="delete-form">
+                            <form method="POST" action="{{ route('schedules.destroy.post', $schedule) }}" class="delete-form">
                                 @csrf
-                                @method('DELETE')
                                 <button type="submit" class="delete-button" onclick="return confirm('Delete this schedule?')">Delete</button>
                             </form>
                         </div>

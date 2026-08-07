@@ -11,7 +11,8 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600;700&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
+    <x-minimal-ui />
+</head>
     <body class="font-sans antialiased bg-slate-100 text-slate-800">
         <div class="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50">
             @include('layouts.navigation')

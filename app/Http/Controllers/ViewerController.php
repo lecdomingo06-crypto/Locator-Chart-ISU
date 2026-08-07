@@ -14,7 +14,8 @@ class ViewerController extends Controller
         $department = $request->department;
 
         $users = User::with('department')
-            ->whereIn('role', ['teacher', 'faculty'])
+            ->whereIn('role', ['professor', 'faculty'])
+            ->where('is_suspended', false)
             ->when($search, function ($query) use ($search) {
                 $query->where('full_name', 'like', '%' . $search . '%');
             })
@@ -34,7 +35,8 @@ class ViewerController extends Controller
         $department = $request->department;
 
         $users = User::with('department')
-            ->whereIn('role', ['teacher', 'faculty'])
+            ->whereIn('role', ['professor', 'faculty'])
+            ->where('is_suspended', false)
             ->when($search, function ($query) use ($search) {
                 $query->where('full_name', 'like', '%' . $search . '%');
             })
