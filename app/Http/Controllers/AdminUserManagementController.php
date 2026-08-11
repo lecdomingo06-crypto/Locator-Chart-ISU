@@ -29,7 +29,7 @@ class AdminUserManagementController extends Controller
         $users = User::query()
             ->whereIn('role', self::STAFF_ROLES)
             ->with('department')
-            ->with(['attendanceRecords' => fn ($query) => $query->whereNull('time_out')->latest('time_in')])
+            ->with('activeAttendanceRecord')
             ->withCount(['attendanceRecords', 'schedules'])
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($searchQuery) use ($search) {
@@ -153,8 +153,7 @@ class AdminUserManagementController extends Controller
             ->update(['time_out' => now()]);
 
         if ($updated > 0) {
-            SpecialSchedule::query()
-                ->where('user_id', $user->id)
+            $user->specialSchedules()
                 ->whereIn('type', ['On Break', 'Not Available'])
                 ->where('start_datetime', '<=', now())
                 ->where('end_datetime', '>=', now())

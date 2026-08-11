@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AttendanceRecord;
-use App\Models\SpecialSchedule;
 use App\Services\AttendanceCalendarService;
 use App\Services\AttendanceGeofenceService;
 use Carbon\Carbon;
@@ -92,8 +90,7 @@ class AttendanceController extends Controller
         }
 
         $created = DB::transaction(function () use ($user, $request, $latitude, $longitude, $accuracy, $locationCheck) {
-            $hasOpenAttendance = AttendanceRecord::query()
-                ->where('user_id', $user->id)
+            $hasOpenAttendance = $user->attendanceRecords()
                 ->whereNull('time_out')
                 ->lockForUpdate()
                 ->exists();
@@ -102,8 +99,7 @@ class AttendanceController extends Controller
                 return false;
             }
 
-            AttendanceRecord::create([
-                'user_id' => $user->id,
+            $user->attendanceRecords()->create([
                 'time_in' => now(),
                 'time_in_latitude' => $latitude,
                 'time_in_longitude' => $longitude,
@@ -130,8 +126,7 @@ class AttendanceController extends Controller
         $user = $request->user();
 
         $attendance = DB::transaction(function () use ($user) {
-            $attendance = AttendanceRecord::query()
-                ->where('user_id', $user->id)
+            $attendance = $user->attendanceRecords()
                 ->whereNull('time_out')
                 ->latest('time_in')
                 ->lockForUpdate()
@@ -152,8 +147,7 @@ class AttendanceController extends Controller
                 ->with('error', 'You are not currently timed in.');
         }
 
-        SpecialSchedule::query()
-            ->where('user_id', $user->id)
+        $user->specialSchedules()
             ->whereIn('type', ['On Break', 'Not Available'])
             ->where('start_datetime', '<=', now())
             ->where('end_datetime', '>=', now())

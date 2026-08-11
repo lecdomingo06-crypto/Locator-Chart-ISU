@@ -21,4 +21,14 @@ class Department extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function academicEvents(): HasMany
+    {
+        return $this->hasMany(AcademicEvent::class);
+    }
+
+    public function pendingStudentRegistrations(): HasMany
+    {
+        return $this->hasMany(PendingStudentRegistration::class);
+    }
 }

@@ -13,7 +13,7 @@
 <tbody>
 @forelse($users as $managedUser)
 @php
-    $openAttendance = $managedUser->attendanceRecords->first();
+    $openAttendance = $managedUser->activeAttendanceRecord;
     $displayName = $managedUser->full_name ?: $managedUser->username;
     $initials = collect(preg_split('/\s+/', $displayName))->filter()->take(2)->map(fn($part) => strtoupper(substr($part, 0, 1)))->implode('');
 @endphp

@@ -37,9 +37,9 @@ class SpecialScheduleController extends Controller
             'keep_until_schedule_end' => 'nullable|boolean',
         ]);
 
-        $userId = Auth::id();
+        $user = $request->user();
 
-        $specialSchedule = SpecialSchedule::create($this->specialSchedulePayload($request, $userId));
+        $specialSchedule = $user->specialSchedules()->create($this->specialSchedulePayload($request, $user->id, false));
         $this->replaceOverlappingAdminOverrides($specialSchedule);
 
         return redirect()->route('special_schedules.create')->with('success', 'Special schedule added successfully.');
@@ -68,7 +68,7 @@ class SpecialScheduleController extends Controller
             'keep_until_schedule_end' => 'nullable|boolean',
         ]);
 
-        $specialSchedule->update($this->specialSchedulePayload($request, Auth::id(), false));
+        $specialSchedule->update($this->specialSchedulePayload($request, $request->user()->id, false));
         $this->replaceOverlappingAdminOverrides($specialSchedule);
 
         return redirect()->route('special_schedules.create')->with('success', 'Special schedule updated successfully.');
@@ -149,7 +149,10 @@ class SpecialScheduleController extends Controller
 
     private function belongsToCurrentUser(SpecialSchedule $specialSchedule): bool
     {
-        return (string) $specialSchedule->user_id === (string) Auth::id();
+        return Auth::user()
+            ?->specialSchedules()
+            ->whereKey($specialSchedule->getKey())
+            ->exists() ?? false;
     }
 
     private function replaceOverlappingAdminOverrides(SpecialSchedule $specialSchedule): void

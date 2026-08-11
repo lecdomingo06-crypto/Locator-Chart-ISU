@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceRecord;
 use App\Models\Department;
-use App\Models\SpecialSchedule;
 use App\Models\User;
 use App\Services\AttendanceCalendarService;
 use Carbon\Carbon;
@@ -261,8 +260,7 @@ class AdminAttendanceController extends Controller
             'force_time_out_reason' => $validated['reason'],
         ]);
 
-        SpecialSchedule::query()
-            ->where('user_id', $user->id)
+        $user->specialSchedules()
             ->whereIn('type', ['On Break', 'Not Available'])
             ->where('start_datetime', '<=', now())
             ->where('end_datetime', '>=', now())
