@@ -5,6 +5,7 @@ namespace App\Providers;
 use Closure;
 use App\Models\User;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->environment('production') || (bool) config('app.force_https')) {
+            URL::forceScheme('https');
+        }
+
         Password::defaults(fn () => Password::min(8)->letters()->numbers()->rules([
             function (string $attribute, mixed $value, Closure $fail): void {
                 if ((string) $value === '12345678') {
