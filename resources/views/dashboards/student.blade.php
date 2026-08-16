@@ -1118,13 +1118,27 @@
                     { code: 'PS', lat: 16.9386111, lng: 121.7642778, color: '#84cc16' },
                 ];
 
+                const campusBounds = L.latLngBounds(
+                    [16.9349, 121.7624],
+                    [16.9413, 121.7667],
+                );
+                const campusPanBounds = campusBounds.pad(0.18);
+
                 const map = L.map(mapElement, {
-                    scrollWheelZoom: false,
+                    maxBounds: campusPanBounds,
+                    maxBoundsViscosity: 0.85,
+                    minZoom: 16,
+                    maxZoom: 19,
+                    scrollWheelZoom: 'center',
+                    wheelPxPerZoomLevel: 120,
+                    zoomSnap: 0.5,
                 });
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; OpenStreetMap contributors',
-                    maxZoom: 20,
+                    minZoom: 16,
+                    maxZoom: 19,
+                    maxNativeZoom: 19,
                 }).addTo(map);
 
                 const bounds = [];
@@ -1151,7 +1165,8 @@
                 });
 
                 if (bounds.length) {
-                    map.fitBounds(bounds, { padding: [36, 36] });
+                    map.fitBounds(campusBounds, { padding: [18, 18], maxZoom: 17 });
+                    map.setMinZoom(Math.max(16, Math.floor(map.getZoom())));
                 }
 
                 requestAnimationFrame(() => {

@@ -95,6 +95,26 @@ class AttendanceTest extends TestCase
         $this->assertNotNull(AttendanceRecord::first()->time_out);
     }
 
+    public function test_open_attendance_is_automatically_timed_out_at_seven_pm(): void
+    {
+        Carbon::setTestNow('2026-06-19 19:05:00');
+
+        $professor = User::factory()->create(['role' => 'professor']);
+        $attendance = AttendanceRecord::create([
+            'user_id' => $professor->id,
+            'time_in' => Carbon::parse('2026-06-19 08:00:00'),
+        ]);
+
+        $this->actingAs($professor)
+            ->get(route('attendance.show'))
+            ->assertOk();
+
+        $attendance->refresh();
+
+        $this->assertSame('2026-06-19 19:00:00', $attendance->time_out->format('Y-m-d H:i:s'));
+        $this->assertSame('Not Available', $professor->fresh()->live_status['status']);
+    }
+
     public function test_time_out_without_an_open_session_is_rejected(): void
     {
         $faculty = User::factory()->create(['role' => 'faculty']);
@@ -107,7 +127,7 @@ class AttendanceTest extends TestCase
         $this->assertDatabaseCount('attendance_records', 0);
     }
 
-    public function test_clear_sessions_only_removes_own_completed_sessions_from_today(): void
+    public function test_clear_sessions_hides_own_completed_sessions_without_deleting_attendance(): void
     {
         Carbon::setTestNow('2026-06-19 20:00:00');
 
@@ -142,10 +162,14 @@ class AttendanceTest extends TestCase
             ->assertRedirect(route('attendance.show'))
             ->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('attendance_records', ['id' => $completedToday->id]);
+        $this->assertDatabaseHas('attendance_records', ['id' => $completedToday->id]);
         $this->assertDatabaseHas('attendance_records', ['id' => $activeToday->id]);
         $this->assertDatabaseHas('attendance_records', ['id' => $completedYesterday->id]);
         $this->assertDatabaseHas('attendance_records', ['id' => $otherUserSession->id]);
+        $this->assertEquals(
+            [$completedToday->id],
+            session("attendance.cleared_sessions.{$professor->id}.2026-06-19")
+        );
     }
 
     public function test_self_attendance_calendar_respects_weekend_schedule_and_excused_status(): void

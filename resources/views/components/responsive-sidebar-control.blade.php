@@ -9,6 +9,16 @@
 <div class="mobile-nav-overlay" data-mobile-nav-overlay></div>
 
 <style data-sidebar-consistency>
+    :root {
+        --shell-sidebar-bg: #ffffff;
+        --shell-sidebar-active: #147247;
+        --shell-sidebar-hover: #f4faf6;
+        --shell-topbar-bg: #0c5c38;
+        --shell-page-bg: #eef7f1;
+        --shell-border: #d3e3d8;
+        --shell-muted: #607766;
+        --shell-sidebar-width: 268px;
+    }
 
     .admin-shell,
     .workspace-shell {
@@ -19,18 +29,12 @@
 
     .workspace-layout,
     .admin-layout {
-        min-height: calc(100vh - 78px) !important;
+        min-height: 100vh !important;
     }
+
     .admin-topbar,
     .workspace-topbar {
-        min-height: 78px !important;
-        padding: 12px 28px !important;
-        color: #ffffff !important;
-        background: #0c5c38 !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
-        box-shadow: 0 8px 22px rgba(8, 59, 38, 0.16) !important;
+        display: none !important;
     }
 
     .admin-brand,
@@ -56,11 +60,12 @@
     .workspace-brand-mark {
         display: grid !important;
         place-items: center !important;
-        width: 48px !important;
-        height: 48px !important;
-        flex: 0 0 48px !important;
+        width: 44px !important;
+        height: 44px !important;
+        flex: 0 0 44px !important;
         overflow: hidden !important;
-        border-radius: 8px !important;
+        border: 0 !important;
+        border-radius: 12px !important;
         background: #ffffff !important;
         box-shadow: none !important;
     }
@@ -98,10 +103,10 @@
 
     .admin-chip,
     .workspace-chip {
-        min-height: 34px !important;
-        padding: 0 12px !important;
+        min-height: 36px !important;
+        padding: 0 13px !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
-        border-radius: 8px !important;
+        border-radius: 12px !important;
         color: #ffffff !important;
         background: rgba(255, 255, 255, 0.1) !important;
         font-size: 0.8rem !important;
@@ -112,9 +117,9 @@
     .workspace-layout,
     .student-workspace {
         display: grid !important;
-        grid-template-columns: 228px minmax(0, 1fr) !important;
+        grid-template-columns: var(--shell-sidebar-width) minmax(0, 1fr) !important;
         gap: 0 !important;
-        background: #eef7f1 !important;
+        background: var(--shell-page-bg) !important;
     }
 
     .admin-main,
@@ -128,33 +133,35 @@
     .workspace-sidebar,
     .student-sidebar {
         z-index: 20 !important;
-        width: 228px !important;
-        min-width: 228px !important;
+        width: var(--shell-sidebar-width) !important;
+        min-width: var(--shell-sidebar-width) !important;
         margin: 0 !important;
-        padding: 24px 14px !important;
+        padding: 24px 18px !important;
         border: 0 !important;
-        border-right: 1px solid #d3e3d8 !important;
+        border-right: 1px solid var(--shell-border) !important;
         border-radius: 0 !important;
-        background: rgba(255, 255, 255, 0.96) !important;
-        box-shadow: none !important;
+        color: #1c3728 !important;
+        background: var(--shell-sidebar-bg) !important;
+        box-shadow: 12px 0 28px rgba(12, 92, 56, 0.06) !important;
     }
 
     .sidebar-brand,
     .student-sidebar-brand {
         gap: 12px !important;
-        padding: 0 8px 20px !important;
-        border-bottom: 1px solid #d3e3d8 !important;
+        padding: 0 4px 28px !important;
+        border-bottom: 1px solid var(--shell-border) !important;
     }
 
     .sidebar-mark,
     .student-sidebar-mark {
         display: grid !important;
         place-items: center !important;
-        width: 46px !important;
-        height: 46px !important;
-        flex: 0 0 46px !important;
+        width: 48px !important;
+        height: 48px !important;
+        flex: 0 0 48px !important;
         overflow: hidden !important;
-        border-radius: 8px !important;
+        border: 1px solid rgba(12, 92, 56, 0.08) !important;
+        border-radius: 12px !important;
         color: #ffffff !important;
         background: #147247 !important;
         box-shadow: none !important;
@@ -174,7 +181,7 @@
     .student-sidebar-copy span,
     .sidebar-note,
     .student-sidebar-note {
-        color: #607766 !important;
+        color: var(--shell-muted) !important;
         font-size: 0.82rem !important;
         line-height: 1.55 !important;
         opacity: 1 !important;
@@ -188,7 +195,7 @@
     .sidebar-section-label,
     .student-nav-label {
         display: block !important;
-        margin: 0 8px 10px !important;
+        margin: 30px 8px 16px !important;
         color: #7b8c81 !important;
         font-size: 0.7rem !important;
         font-weight: 800 !important;
@@ -200,7 +207,7 @@
     .student-nav {
         display: grid !important;
         grid-template-columns: 1fr !important;
-        gap: 5px !important;
+        gap: 10px !important;
         width: 100% !important;
     }
 
@@ -209,9 +216,10 @@
         justify-content: flex-start !important;
         gap: 11px !important;
         width: 100% !important;
-        min-height: 44px !important;
-        padding: 0 12px !important;
-        border-radius: 7px !important;
+        min-height: 48px !important;
+        padding: 0 15px !important;
+        border: 1px solid transparent !important;
+        border-radius: 11px !important;
         color: #1c3728 !important;
         background: transparent !important;
         font: 700 0.87rem/1.2 'Outfit', system-ui, sans-serif !important;
@@ -222,13 +230,15 @@
     .sidebar-link:hover,
     .student-nav-link:hover {
         color: #0c5c38 !important;
-        background: #f4faf6 !important;
+        background: var(--shell-sidebar-hover) !important;
     }
 
     .sidebar-link.is-active,
     .student-nav-link.is-active {
         color: #ffffff !important;
-        background: #147247 !important;
+        border-color: rgba(20, 114, 71, 0.12) !important;
+        background: var(--shell-sidebar-active) !important;
+        box-shadow: 0 10px 20px rgba(12, 92, 56, 0.12) !important;
     }
 
     .sidebar-link svg,
@@ -256,12 +266,48 @@
         object-fit: contain;
     }
 
+    .sidebar-account-footer {
+        border-top-color: rgba(12, 92, 56, 0.16) !important;
+        color: #173524 !important;
+    }
+
+    .sidebar-account-identity strong {
+        color: #173524 !important;
+    }
+
+    .sidebar-account-identity span {
+        color: var(--shell-muted) !important;
+    }
+
+    .sidebar-account-logout button {
+        border-color: rgba(20, 114, 71, 0.32) !important;
+        color: #0c5c38 !important;
+        background: #ffffff !important;
+    }
+
+    .sidebar-account-logout button:hover {
+        background: #eef8f1 !important;
+    }
+
     .mobile-nav-toggle,
     .mobile-nav-overlay {
         display: none;
     }
 
     @media (min-width: 841px) {
+        .admin-topbar,
+        .workspace-topbar {
+            box-sizing: border-box !important;
+            width: calc(100% - var(--shell-sidebar-width)) !important;
+            margin-left: var(--shell-sidebar-width) !important;
+            justify-content: flex-end !important;
+        }
+
+        .admin-brand,
+        .workspace-brand {
+            display: none !important;
+        }
+
         .admin-layout,
         .workspace-layout,
         .student-workspace {
@@ -274,6 +320,7 @@
             align-self: start !important;
             position: sticky !important;
             top: 0 !important;
+            z-index: 60 !important;
             display: flex !important;
             flex-direction: column !important;
             min-height: 0 !important;
@@ -283,9 +330,9 @@
 
         .admin-sidebar,
         .workspace-sidebar {
-            top: 78px !important;
-            height: calc(100vh - 78px) !important;
-            max-height: calc(100vh - 78px) !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            margin-top: 0 !important;
         }
 
         .student-sidebar {

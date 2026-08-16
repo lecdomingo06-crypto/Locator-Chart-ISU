@@ -11,7 +11,6 @@
         </div>
     </div>
 
-    <p class="student-sidebar-note">Check staff availability, view the campus map, and manage your account.</p>
     <span class="student-nav-label">Workspace</span>
 
     <nav class="student-nav" aria-label="Student workspace">
@@ -47,7 +46,7 @@
 <style>
     .student-workspace {
         display: grid;
-        grid-template-columns: 228px minmax(0, 1fr);
+        grid-template-columns: var(--shell-sidebar-width, 268px) minmax(0, 1fr);
         min-height: 100vh;
     }
 
@@ -58,7 +57,7 @@
         display: flex;
         flex-direction: column;
         height: 100vh;
-        padding: 24px 14px;
+        padding: 24px 18px;
         border-right: 1px solid #d3e3d8;
         background: rgba(255, 255, 255, 0.96);
         box-shadow: none;
@@ -68,16 +67,16 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 0 8px 20px;
+        padding: 0 4px 24px;
         border-bottom: 1px solid #d3e3d8;
     }
 
     .student-sidebar-mark {
         display: grid;
         place-items: center;
-        width: 46px;
-        height: 46px;
-        flex: 0 0 46px;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
         overflow: hidden;
         border-radius: 8px;
         background: #147247;
@@ -106,7 +105,7 @@
     }
 
     .student-nav-label {
-        margin: 0 8px 10px;
+        margin: 30px 8px 16px;
         color: #7b8c81;
         font-size: 0.7rem;
         font-weight: 800;
@@ -116,16 +115,16 @@
 
     .student-nav {
         display: grid;
-        gap: 5px;
+        gap: 10px;
     }
 
     .student-nav-link {
         display: flex;
         align-items: center;
         gap: 11px;
-        min-height: 44px;
-        padding: 0 12px;
-        border-radius: 7px;
+        min-height: 48px;
+        padding: 0 15px;
+        border-radius: 11px;
         color: #1c3728;
         font: 700 0.87rem/1.2 'Outfit', system-ui, sans-serif;
         text-decoration: none;

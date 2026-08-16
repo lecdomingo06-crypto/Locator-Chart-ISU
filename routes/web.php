@@ -14,12 +14,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SpecialScheduleController;
 use App\Http\Controllers\ViewerController;
+use App\Models\AttendanceRecord;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
     $snapshotStaff = User::snapshotStaff();
     $snapshotTotals = User::snapshotTotals();
     $availableProfessorSnapshot = User::availableProfessorSnapshot();
@@ -69,6 +72,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/status', [AdminStatusController::class, 'index'])->name('admin.status');
     Route::post('/admin/status', [AdminStatusController::class, 'store'])->name('admin.status.store');
     Route::get('/admin/viewer', function (Request $request) {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $search = $request->search;
         $department = $request->department;
 

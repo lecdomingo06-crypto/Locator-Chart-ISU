@@ -744,8 +744,6 @@
                     </div>
                 </div>
 
-                <p class="sidebar-note">Monitor live status, accounts, overrides, and academic events.</p>
-
                 <span class="sidebar-section-label">Workspace</span>
                 <nav class="sidebar-nav" aria-label="Admin workspace">
                     <a href="{{ route('admin.viewer') }}" class="sidebar-link{{ request()->routeIs('admin.viewer') ? ' is-active' : '' }}">

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Schedule;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ScheduleController extends Controller
 {
@@ -13,9 +12,9 @@ class ScheduleController extends Controller
         return redirect()->route('schedules.create');
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $schedules = $this->currentUserSchedules();
+        $schedules = $this->currentUserSchedules($request);
 
         return view('schedules.create', compact('schedules'));
     }
@@ -32,8 +31,7 @@ class ScheduleController extends Controller
             'school_year' => 'required|string|max:255',
         ]);
 
-        Schedule::create([
-            'user_id' => Auth::id(),
+        $request->user()->schedules()->create([
             'subject' => $request->subject,
             'room' => $request->room,
             'day_of_week' => $request->day_of_week,
@@ -46,20 +44,22 @@ class ScheduleController extends Controller
         return redirect()->route('schedules.create')->with('success', 'Schedule added successfully.');
     }
 
-    public function edit(Schedule $schedule)
+    public function edit(Request $request, Schedule $schedule)
     {
-        if (! $this->belongsToCurrentUser($schedule)) {
+        if (! $this->belongsToCurrentUser($request, $schedule)) {
             return redirect()
                 ->route('schedules.create')
                 ->with('error', 'That schedule is not available for this account.');
         }
 
-        return view('schedules.edit', compact('schedule'));
+        return redirect()
+            ->route('schedules.create')
+            ->with('info', 'Open the schedule from the timetable to edit it in the popup.');
     }
 
     public function update(Request $request, Schedule $schedule)
     {
-        if (! $this->belongsToCurrentUser($schedule)) {
+        if (! $this->belongsToCurrentUser($request, $schedule)) {
             return redirect()
                 ->route('schedules.create')
                 ->with('error', 'That schedule is not available for this account.');
@@ -88,9 +88,9 @@ class ScheduleController extends Controller
         return redirect()->route('schedules.create')->with('success', 'Schedule updated successfully.');
     }
 
-    public function destroy(Schedule $schedule)
+    public function destroy(Request $request, Schedule $schedule)
     {
-        if (! $this->belongsToCurrentUser($schedule)) {
+        if (! $this->belongsToCurrentUser($request, $schedule)) {
             return redirect()
                 ->route('schedules.create')
                 ->with('error', 'That schedule is not available for this account.');
@@ -101,16 +101,20 @@ class ScheduleController extends Controller
         return redirect()->route('schedules.create')->with('success', 'Schedule deleted successfully.');
     }
 
-    private function currentUserSchedules()
+    private function currentUserSchedules(Request $request)
     {
-        return Schedule::where('user_id', Auth::id())
-            ->orderByRaw("FIELD(day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
+        return $request->user()
+            ->schedules()
+            ->orderByRaw("CASE day_of_week WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 ELSE 8 END")
             ->orderBy('start_time')
             ->get();
     }
 
-    private function belongsToCurrentUser(Schedule $schedule): bool
+    private function belongsToCurrentUser(Request $request, Schedule $schedule): bool
     {
-        return (string) $schedule->user_id === (string) Auth::id();
+        return $request->user()
+            ->schedules()
+            ->whereKey($schedule->getKey())
+            ->exists();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AttendanceRecord extends Model
 {
     use HasFactory;
+
+    private const AUTO_TIME_OUT_HOUR = 19;
 
     protected $fillable = [
         'user_id',
@@ -49,6 +52,55 @@ class AttendanceRecord extends Model
     public function forcedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'forced_time_out_by');
+    }
+
+    public static function autoTimeOutExpiredOpenSessions(?Carbon $moment = null): int
+    {
+        $moment ??= Carbon::now();
+        $updated = 0;
+
+        static::query()
+            ->whereNull('time_out')
+            ->where('time_in', '<=', $moment)
+            ->oldest('time_in')
+            ->get()
+            ->each(function (self $attendance) use ($moment, &$updated) {
+                $timeOutAt = $attendance->automaticTimeOutAt();
+
+                if ($moment->lt($timeOutAt)) {
+                    return;
+                }
+
+                $attendance->forceFill(['time_out' => $timeOutAt])->save();
+                $attendance->closeTemporaryAvailabilityAt($timeOutAt);
+                $updated++;
+            });
+
+        return $updated;
+    }
+
+    public function automaticTimeOutAt(): Carbon
+    {
+        $timeIn = $this->time_in instanceof Carbon
+            ? $this->time_in->copy()
+            : Carbon::parse($this->time_in);
+        $cutoff = $timeIn->copy()->setTime(self::AUTO_TIME_OUT_HOUR, 0, 0);
+
+        if ($timeIn->gt($cutoff)) {
+            $cutoff->addDay();
+        }
+
+        return $cutoff;
+    }
+
+    private function closeTemporaryAvailabilityAt(Carbon $timeOutAt): void
+    {
+        SpecialSchedule::query()
+            ->where('user_id', $this->user_id)
+            ->whereIn('type', ['On Break', 'Not Available'])
+            ->where('start_datetime', '<=', $timeOutAt)
+            ->where('end_datetime', '>=', $timeOutAt)
+            ->update(['end_datetime' => $timeOutAt->copy()->subSecond()]);
     }
 }
 

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Models\SpecialSchedule;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AvailabilityController extends Controller
 {
@@ -14,10 +15,12 @@ class AvailabilityController extends Controller
         'Not Available',
     ];
 
-    public function show()
+    public function show(Request $request)
     {
-        $user = Auth::user();
-        $activeAvailability = $this->activeAvailabilitySchedule();
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
+        $user = $request->user();
+        $activeAvailability = $this->activeAvailabilitySchedule($user);
 
         return view('availability.show', compact('user', 'activeAvailability'));
     }
@@ -32,9 +35,10 @@ class AvailabilityController extends Controller
         return $this->startAvailability($request, 'Not Available', 'Not available status started.');
     }
 
-    public function available()
+    public function available(Request $request)
     {
-        $activeAvailability = $this->activeAvailabilitySchedule();
+        $user = $request->user();
+        $activeAvailability = $this->activeAvailabilitySchedule($user);
 
         if (! $activeAvailability) {
             return redirect()
@@ -42,7 +46,7 @@ class AvailabilityController extends Controller
                 ->with('error', 'No break or not available status is active right now.');
         }
 
-        SpecialSchedule::where('user_id', Auth::id())
+        $user->specialSchedules()
             ->whereIn('type', self::AVAILABILITY_TYPES)
             ->where('start_datetime', '<=', now())
             ->where('end_datetime', '>=', now())
@@ -55,13 +59,17 @@ class AvailabilityController extends Controller
 
     private function startAvailability(Request $request, string $type, string $message)
     {
-        if (! Auth::user()->isTimedIn()) {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
+        $user = $request->user();
+
+        if (! $user->isTimedIn()) {
             return redirect()
                 ->route('availability.show')
                 ->with('error', 'Please time in before updating your availability.');
         }
 
-        if (Auth::user()->live_status['status'] !== 'Available') {
+        if ($user->live_status['status'] !== 'Available') {
             return redirect()
                 ->route('availability.show')
                 ->with('error', 'You can only start this status while you are currently available.');
@@ -71,8 +79,7 @@ class AvailabilityController extends Controller
             'end_datetime' => ['required', 'date', 'after:now'],
         ]);
 
-        SpecialSchedule::create([
-            'user_id' => Auth::id(),
+        $user->specialSchedules()->create([
             'type' => $type,
             'start_datetime' => now()->toDateTimeString(),
             'end_datetime' => Carbon::parse($request->end_datetime)->toDateTimeString(),
@@ -87,9 +94,9 @@ class AvailabilityController extends Controller
             ->with('success', $message);
     }
 
-    private function activeAvailabilitySchedule(): ?SpecialSchedule
+    private function activeAvailabilitySchedule(User $user): ?SpecialSchedule
     {
-        return SpecialSchedule::where('user_id', Auth::id())
+        return $user->specialSchedules()
             ->whereIn('type', self::AVAILABILITY_TYPES)
             ->where('start_datetime', '<=', now())
             ->where('end_datetime', '>=', now())

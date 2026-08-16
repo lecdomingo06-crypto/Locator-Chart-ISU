@@ -235,19 +235,31 @@
             box-shadow: 0 12px 24px rgba(12, 92, 56, 0.16);
         }
 
-        .workspace-main .page { padding: 24px 28px 32px 0; }
+        .workspace-main .page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 42px 32px 40px 0;
+        }
 
         .shell {
             display: grid;
-            gap: 18px;
+            gap: 16px;
+            width: min(100%, 1120px);
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 22px 50px rgba(12, 92, 56, 0.08);
         }
 
         .page-title {
             display: flex;
-            align-items: end;
+            align-items: center;
             justify-content: space-between;
-            gap: 16px;
-            padding: 2px 2px 0;
+            gap: 20px;
+            padding: 0 0 2px;
         }
 
         .title-copy,
@@ -271,13 +283,14 @@
             letter-spacing: -0.03em;
         }
 
-        .title-copy h1 { font-size: 1.45rem; }
-        .panel-head h2 { font-size: 1.25rem; }
+        .title-copy h1 { font-size: clamp(1.8rem, 3vw, 2.45rem); }
+        .panel-head h2 { font-size: 1.18rem; }
 
         .title-pill {
             display: inline-flex;
             align-items: center;
-            padding: 8px 12px;
+            min-height: 38px;
+            padding: 0 14px;
             border-radius: 999px;
             color: var(--green-900);
             background: rgba(221, 244, 228, 0.8);
@@ -288,7 +301,7 @@
 
         .availability-grid {
             display: grid;
-            grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
+            grid-template-columns: 290px minmax(0, 1fr);
             gap: 18px;
             align-items: start;
         }
@@ -299,9 +312,9 @@
             position: relative;
             overflow: hidden;
             border: 1px solid var(--card-border);
-            border-radius: 20px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 251, 246, 0.96));
-            box-shadow: var(--shadow);
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 14px 34px rgba(12, 92, 56, 0.06);
         }
 
         .status-panel::before,
@@ -309,27 +322,34 @@
             content: '';
             position: absolute;
             inset: 0 0 auto 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--green-900), var(--green-700));
+            height: 0;
         }
 
         .status-panel,
         .control-panel {
-            padding: 20px;
+            padding: 18px;
+        }
+
+        .control-panel {
+            overflow: visible;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            box-shadow: none;
         }
 
         .profile-head {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 16px;
         }
 
         .profile-photo,
         .profile-placeholder {
-            flex: 0 0 86px;
-            width: 86px;
-            height: 86px;
-            border-radius: 18px;
+            flex: 0 0 76px;
+            width: 76px;
+            height: 76px;
+            border-radius: 16px;
             border: 2px solid rgba(20, 114, 71, 0.08);
         }
 
@@ -360,7 +380,7 @@
 
         .profile-copy h2 {
             margin: 0;
-            font-size: 1.35rem;
+            font-size: 1.14rem;
             letter-spacing: -0.03em;
         }
 
@@ -377,9 +397,11 @@
             gap: 12px;
             margin-top: 18px;
             padding: 14px;
-            border-radius: 16px;
-            background: rgba(232, 245, 236, 0.55);
-            border: 1px solid rgba(20, 114, 71, 0.08);
+            border-radius: 14px;
+            color: var(--text);
+            background: #f7fbf8;
+            border: 1px solid rgba(20, 114, 71, 0.1);
+            box-shadow: none;
         }
 
         .status-card span,
@@ -392,10 +414,20 @@
             text-transform: uppercase;
         }
 
+        .status-card span {
+            color: var(--muted);
+        }
+
         .status-card strong,
         .detail-tile strong {
             display: block;
             margin-top: 6px;
+        }
+
+        .status-card strong {
+            font-size: 1.08rem;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
         }
 
         .status-badge {
@@ -403,12 +435,12 @@
             align-items: center;
             justify-content: center;
             flex: 0 0 auto;
-            min-width: 124px;
-            max-width: 160px;
-            padding: 8px 14px;
+            min-width: 116px;
+            max-width: 180px;
+            padding: 8px 12px;
             border-radius: 999px;
             color: #ffffff;
-            font-size: 0.76rem;
+            font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.05em;
             overflow: hidden;
@@ -420,15 +452,15 @@
         .detail-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-            margin-top: 18px;
+            gap: 10px;
+            margin-top: 12px;
         }
 
         .detail-tile {
             min-width: 0;
-            padding: 14px;
-            border-radius: 16px;
-            background: rgba(221, 244, 228, 0.52);
+            padding: 12px;
+            border-radius: 14px;
+            background: #f7fbf8;
             border: 1px solid rgba(20, 114, 71, 0.1);
         }
 
@@ -439,33 +471,106 @@
         }
 
         .panel-head {
-            margin-bottom: 18px;
+            padding: 0 2px;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+
+        .panel-state {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 34px;
+            padding: 0 12px;
+            border-radius: 999px;
+            color: var(--green-900);
+            background: rgba(221, 244, 228, 0.72);
+            border: 1px solid rgba(20, 114, 71, 0.12);
+            font-size: 0.78rem;
+            font-weight: 800;
         }
 
         .action-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
+            gap: 12px;
         }
 
         .action-card {
             display: grid;
+            grid-template-rows: auto auto auto 1fr;
             gap: 12px;
-            min-height: 230px;
+            min-height: 192px;
             padding: 16px;
             box-shadow: none;
+            transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(20, 114, 71, 0.22);
+            box-shadow: 0 12px 26px rgba(12, 92, 56, 0.07);
+        }
+
+        .action-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .action-icon {
+            display: grid;
+            place-items: center;
+            flex: 0 0 42px;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            color: var(--green-900);
+            background: var(--green-100);
+        }
+
+        .action-icon::before {
+            content: '';
+            width: 11px;
+            height: 11px;
+            border-radius: 999px;
+            background: currentColor;
+            box-shadow: 0 0 0 7px color-mix(in srgb, currentColor 14%, transparent);
+        }
+
+        .action-card.tone-break .action-icon {
+            color: #d97706;
+            background: #fff7ed;
+        }
+
+        .action-card.tone-unavailable .action-icon {
+            color: #6b7280;
+            background: #f3f4f6;
+        }
+
+        .action-card.tone-available .action-icon {
+            color: var(--green-800);
+            background: var(--green-100);
         }
 
         .action-card h3 {
             margin: 0;
-            font-size: 1.05rem;
+            font-size: 1rem;
+            letter-spacing: -0.02em;
         }
 
-        .action-card p {
+        .action-card p,
+        .action-meta {
             margin: 0;
             color: var(--muted);
-            font-size: 0.9rem;
-            line-height: 1.55;
+            font-size: 0.84rem;
+            line-height: 1.45;
+        }
+
+        .action-meta {
+            min-height: 20px;
         }
 
         .field {
@@ -483,7 +588,7 @@
 
         .field input {
             width: 100%;
-            min-height: 42px;
+            min-height: 40px;
             padding: 0 12px;
             border: 1px solid var(--card-border);
             border-radius: 12px;
@@ -493,21 +598,32 @@
             outline: none;
         }
 
+        .field input:focus {
+            border-color: rgba(20, 114, 71, 0.45);
+            box-shadow: 0 0 0 4px rgba(20, 114, 71, 0.08);
+        }
+
         .button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            min-height: 44px;
+            min-height: 42px;
             padding: 0 14px;
             border: 0;
             border-radius: 12px;
             color: #ffffff;
             background: linear-gradient(135deg, var(--green-800), var(--green-900));
             font: inherit;
-            font-size: 0.86rem;
+            font-size: 0.84rem;
             font-weight: 800;
             cursor: pointer;
+            transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+        }
+
+        .button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 22px rgba(12, 92, 56, 0.16);
         }
 
         .button.break {
@@ -539,19 +655,32 @@
         }
 
         .notice {
-            padding: 12px 14px;
+            margin-bottom: 14px;
+            padding: 10px 12px;
             border-radius: 14px;
             color: var(--green-900);
             background: rgba(221, 244, 228, 0.72);
             border: 1px solid rgba(20, 114, 71, 0.14);
-            font-size: 0.9rem;
+            font-size: 0.86rem;
             font-weight: 700;
             line-height: 1.5;
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            .action-card,
+            .button {
+                transition: none;
+            }
+
+            .action-card:hover,
+            .button:hover:not(:disabled) {
+                transform: none;
+            }
+        }
+
         @media (max-width: 1280px) {
             .action-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
 
@@ -589,7 +718,14 @@
             }
 
             .workspace-main .page {
+                align-items: flex-start;
+                min-height: 0;
                 padding: 0 16px 24px;
+            }
+
+            .shell {
+                width: 100%;
+                padding: 18px;
             }
         }
 
@@ -623,9 +759,15 @@
                 padding: 0 14px 20px;
             }
 
+            .shell {
+                padding: 16px;
+                border-radius: 18px;
+            }
+
             .page-title,
             .profile-head,
-            .status-card {
+            .status-card,
+            .panel-head {
                 align-items: flex-start;
                 flex-direction: column;
             }
@@ -635,6 +777,15 @@
                 padding: 16px;
                 border-radius: 18px;
             }
+
+            .status-badge {
+                width: 100%;
+                max-width: none;
+            }
+
+            .panel-head {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
     <x-minimal-ui />
@@ -642,6 +793,7 @@
 <body>
 @php
     $displayName = $user->full_name ?: $user->username;
+    $firstName = preg_split('/\s+/', trim($displayName))[0] ?? $displayName;
     $departmentName = $user->department->name ?? 'No department assigned';
     $statusData = $user->live_status;
     $status = $statusData['status'];
@@ -695,8 +847,6 @@
                         <span>Viewer and schedule tools</span>
                     </div>
                 </div>
-
-                <p class="sidebar-note">Update your real-time availability for the live viewer.</p>
 
                 <span class="sidebar-section-label">Workspace</span>
                 <nav class="sidebar-nav" aria-label="{{ ucfirst($user->role) }} workspace">
@@ -770,7 +920,7 @@
                         <section class="page-title" aria-label="Availability title">
                             <div class="title-copy">
                                 <span>Availability</span>
-                                <h1>Real-Time Availability Control</h1>
+                                <h1>Welcome, {{ $firstName }}!</h1>
                             </div>
 
                             <div class="title-pill">{{ $canStartAvailability ? 'Ready to update' : 'Status locked' }}</div>
@@ -788,7 +938,7 @@
                                     @endif
 
                                     <div class="profile-copy">
-                                        <span>Current Status</span>
+                                        <span>Signed in</span>
                                         <h2>{{ $displayName }}</h2>
                                         <p>{{ ucfirst($user->role) }} · {{ $departmentName }}</p>
                                     </div>
@@ -796,12 +946,12 @@
 
                                 <div class="status-card">
                                     <div>
-                                        <span>Live Viewer Status</span>
-                                        <strong>{{ $statusData['source'] === 'default' ? 'Manual availability' : ucwords(str_replace('_', ' ', $statusData['source'] ?? 'Live status')) }}</strong>
+                                        <span>Live viewer status</span>
+                                        <strong>{{ $status }}</strong>
                                     </div>
 
                                     <div class="status-badge" style="background-color: {{ $badgeColor }};">
-                                        {{ $status }}
+                                        {{ $statusData['source'] === 'default' ? 'Manual' : ucwords(str_replace('_', ' ', $statusData['source'] ?? 'Live')) }}
                                     </div>
                                 </div>
 
@@ -817,32 +967,38 @@
                                     </div>
 
                                     <div class="detail-tile">
-                                        <span>Break Control</span>
-                                        <strong>{{ $canStartAvailability ? 'Enabled' : 'Unavailable' }}</strong>
+                                        <span>Actions</span>
+                                        <strong>{{ $canStartAvailability ? 'Unlocked' : 'Locked' }}</strong>
                                     </div>
 
                                     <div class="detail-tile">
-                                        <span>Available Button</span>
-                                        <strong>{{ $canEndAvailability ? 'Ready' : 'No active break' }}</strong>
+                                        <span>Timer</span>
+                                        <strong>{{ $canEndAvailability ? 'Active' : 'None' }}</strong>
                                     </div>
                                 </div>
                             </section>
 
                             <section class="control-panel">
                                 <div class="panel-head">
-                                    <span>Status Buttons</span>
-                                    <h2>Update Viewer Availability</h2>
+                                    <div>
+                                        <span>Quick Actions</span>
+                                        <h2>Update your status</h2>
+                                    </div>
+                                    <div class="panel-state">{{ $canStartAvailability ? 'Available now' : 'Locked by status' }}</div>
                                 </div>
 
                                 @if(! $canStartAvailability && ! $canEndAvailability)
-                                    <div class="notice">Break and Not Available can only be started when your current status is Available.</div>
+                                    <div class="notice">Temporary updates can start only when your live status is Available.</div>
                                 @endif
 
                                 <div class="action-grid">
-                                    <form method="POST" action="{{ route('availability.break') }}" class="action-card">
+                                    <form method="POST" action="{{ route('availability.break') }}" class="action-card tone-break">
                                         @csrf
-                                        <h3>On Break</h3>
-                                        <p>Use this for a short break. It will show as On Break in the live viewer until the selected time.</p>
+                                        <div class="action-top">
+                                            <h3>On Break</h3>
+                                            <span class="action-icon" aria-hidden="true"></span>
+                                        </div>
+                                        <p class="action-meta">Short pause until a set time.</p>
 
                                         <div class="field">
                                             <label for="break_end_datetime">Until</label>
@@ -855,10 +1011,13 @@
                                         <button type="submit" class="button break" {{ $canStartAvailability ? '' : 'disabled' }}>On Break</button>
                                     </form>
 
-                                    <form method="POST" action="{{ route('availability.unavailable') }}" class="action-card">
+                                    <form method="POST" action="{{ route('availability.unavailable') }}" class="action-card tone-unavailable">
                                         @csrf
-                                        <h3>Not Available</h3>
-                                        <p>Use this when you cannot accept visits or interruptions until a specific time.</p>
+                                        <div class="action-top">
+                                            <h3>Not Available</h3>
+                                            <span class="action-icon" aria-hidden="true"></span>
+                                        </div>
+                                        <p class="action-meta">Block visits until a set time.</p>
 
                                         <div class="field">
                                             <label for="unavailable_end_datetime">Until</label>
@@ -868,15 +1027,17 @@
                                         <button type="submit" class="button unavailable" {{ $canStartAvailability ? '' : 'disabled' }}>Not Available</button>
                                     </form>
 
-                                    <form method="POST" action="{{ route('availability.available') }}" class="action-card">
+                                    <form method="POST" action="{{ route('availability.available') }}" class="action-card tone-available">
                                         @csrf
-                                        <h3>Available</h3>
-                                        <p>Use this if your break or unavailable time is not finished yet but you are already available again.</p>
+                                        <div class="action-top">
+                                            <h3>Available</h3>
+                                            <span class="action-icon" aria-hidden="true"></span>
+                                        </div>
 
                                         @if($activeAvailability)
-                                            <p class="helper-note">Active until {{ \Carbon\Carbon::parse($activeAvailability->end_datetime)->format('M j, g:i A') }}.</p>
+                                            <p class="action-meta">Timer ends {{ \Carbon\Carbon::parse($activeAvailability->end_datetime)->format('M j, g:i A') }}.</p>
                                         @else
-                                            <p class="helper-note">No active break or not available timer.</p>
+                                            <p class="action-meta">No active temporary status.</p>
                                         @endif
 
                                         <button type="submit" class="button" {{ $canEndAvailability ? '' : 'disabled' }}>Available</button>

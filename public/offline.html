@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0f6b3d">
+    <title>Offline - Professor Tracking System</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --green: #0f6b3d;
+            --soft: #eef8f1;
+            --text: #11291d;
+            --muted: #63766a;
+            --border: #d7e8de;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            color: var(--text);
+            background: var(--soft);
+        }
+
+        main {
+            width: min(100%, 440px);
+            padding: 28px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 20px 50px rgba(15, 107, 61, 0.12);
+        }
+
+        img {
+            width: 58px;
+            height: 58px;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        h1 {
+            margin: 22px 0 10px;
+            font-size: 1.7rem;
+            line-height: 1.1;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        a {
+            display: inline-flex;
+            margin-top: 22px;
+            min-height: 42px;
+            align-items: center;
+            padding: 0 18px;
+            border-radius: 999px;
+            color: #fff;
+            background: var(--green);
+            font-weight: 700;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <img src="/images/isulogo.jpg" alt="">
+        <h1>You are offline</h1>
+        <p>Some saved pages and assets may still open. Connect to the internet again to refresh live availability, attendance, and schedule data.</p>
+        <a href="/">Try again</a>
+    </main>
+</body>
+</html>

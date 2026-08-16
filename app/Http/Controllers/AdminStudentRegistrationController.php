@@ -8,7 +8,6 @@ use App\Models\PendingStudentRegistration;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -54,7 +53,7 @@ class AdminStudentRegistrationController extends Controller
             );
     }
 
-    public function approve(PendingStudentRegistration $registration): RedirectResponse
+    public function approve(Request $request, PendingStudentRegistration $registration): RedirectResponse
     {
         if ($registration->status !== 'pending') {
             return redirect()
@@ -87,12 +86,13 @@ class AdminStudentRegistrationController extends Controller
 
         $user->assignRole('student');
 
-        $registration->update([
+        $registration->fill([
             'status' => 'approved',
-            'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
             'decline_reason' => null,
         ]);
+        $registration->reviewer()->associate($request->user());
+        $registration->save();
 
         try {
             Mail::to($registration->email)->send(new StudentRegistrationApproved($registration));
@@ -121,12 +121,13 @@ class AdminStudentRegistrationController extends Controller
             'decline_reason' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $registration->update([
+        $registration->fill([
             'status' => 'declined',
-            'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
             'decline_reason' => $validated['decline_reason'] ?? null,
         ]);
+        $registration->reviewer()->associate($request->user());
+        $registration->save();
 
         try {
             Mail::to($registration->email)->send(new StudentRegistrationDeclined($registration));

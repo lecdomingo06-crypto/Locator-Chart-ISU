@@ -1043,83 +1043,6 @@
         }
     </style>
     <x-minimal-ui />
-    <style data-viewer-minimal-fix>
-        .workspace-main .page {
-            padding: 24px 28px 32px 0 !important;
-        }
-
-        .workspace-main .shell {
-            width: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-        }
-
-        .workspace-main .topbar h1 {
-            font-size: 2.9rem !important;
-            line-height: 1.05 !important;
-            color: #f5fff8 !important;
-        }
-
-        .workspace-main .hero-copy p {
-            color: rgba(241, 255, 246, 0.82) !important;
-            line-height: 1.7 !important;
-        }
-
-        .workspace-main .viewer-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-            gap: 16px !important;
-        }
-
-        .workspace-main .viewer-card {
-            grid-template-rows: 82px 92px 88px 48px !important;
-            height: 376px !important;
-            gap: 12px !important;
-            padding: 18px !important;
-            border-radius: 20px !important;
-        }
-
-        .workspace-main .viewer-title h3 {
-            font-size: 1.15rem !important;
-            line-height: 1.25 !important;
-        }
-
-        .workspace-main .viewer-title p {
-            line-height: 1.5 !important;
-        }
-
-        @media (max-width: 1280px) {
-            .workspace-main .viewer-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .workspace-main .viewer-grid {
-                grid-template-columns: 1fr !important;
-            }
-
-            .workspace-main .page {
-                padding: 0 16px 24px !important;
-            }
-        }
-
-        @media (max-width: 720px) {
-            .workspace-main .page {
-                padding: 0 14px 20px !important;
-            }
-
-            .workspace-main .topbar h1 {
-                font-size: 1.8rem !important;
-            }
-
-            .workspace-main .viewer-card {
-                grid-template-rows: none !important;
-                height: auto !important;
-                padding: 16px !important;
-                border-radius: 18px !important;
-            }
-        }
-    </style>
 </head>
 <body>
 @php
@@ -1179,8 +1102,6 @@
                         <span>Viewer and schedule tools</span>
                     </div>
                 </div>
-
-                <p class="sidebar-note">Monitor live availability and manage your personal schedule tools.</p>
 
                 <span class="sidebar-section-label">Workspace</span>
                 <nav class="sidebar-nav" aria-label="{{ ucfirst(Auth::user()->role) }} workspace">

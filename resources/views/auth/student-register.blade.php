@@ -405,12 +405,12 @@
                     <p>All fields are required.</p>
                 </div>
 
-                <form method="POST" action="{{ route('student.register.store') }}" class="registration-form">
+                <form method="POST" action="{{ route('student.register.store') }}" class="registration-form" autocomplete="on">
                     @csrf
 
                     <div class="field">
                         <label for="student_id" class="field-label">Student ID</label>
-                        <input id="student_id" class="field-input" type="text" name="student_id" value="{{ old('student_id') }}" required autofocus autocomplete="username">
+                        <input id="student_id" class="field-input" type="text" name="student_id" value="{{ old('student_id') }}" required autofocus autocomplete="username" autocapitalize="none" spellcheck="false">
                         @error('student_id')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
@@ -449,8 +449,8 @@
 
                     <div class="field">
                         <label for="password" class="field-label">Password</label>
-                        <input id="password" class="field-input" type="password" name="password" required autocomplete="new-password">
-                        <p class="field-hint">Use at least 8 characters with letters and numbers.</p>
+                        <input id="password" class="field-input" type="password" name="password" required autocomplete="new-password" autocapitalize="none" spellcheck="false">
+                        <x-password-strength for="password" confirmation="password_confirmation" />
                         @error('password')
                             <p class="field-error">{{ $message }}</p>
                         @enderror
@@ -458,7 +458,7 @@
 
                     <div class="field">
                         <label for="password_confirmation" class="field-label">Confirm password</label>
-                        <input id="password_confirmation" class="field-input" type="password" name="password_confirmation" required autocomplete="new-password">
+                        <input id="password_confirmation" class="field-input" type="password" name="password_confirmation" required autocomplete="new-password" autocapitalize="none" spellcheck="false">
                         @error('password_confirmation')
                             <p class="field-error">{{ $message }}</p>
                         @enderror

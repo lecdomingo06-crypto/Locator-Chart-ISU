@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Models\Department;
 use App\Models\SpecialSchedule;
 use App\Models\User;
@@ -20,6 +21,8 @@ class AdminUserManagementController extends Controller
 
     public function index(Request $request): View
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
             'role' => ['nullable', Rule::in(self::STAFF_ROLES)],
@@ -29,7 +32,7 @@ class AdminUserManagementController extends Controller
         $users = User::query()
             ->whereIn('role', self::STAFF_ROLES)
             ->with('department')
-            ->with(['attendanceRecords' => fn ($query) => $query->whereNull('time_out')->latest('time_in')])
+            ->with('activeAttendanceRecord')
             ->withCount(['attendanceRecords', 'schedules'])
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($searchQuery) use ($search) {
@@ -53,6 +56,8 @@ class AdminUserManagementController extends Controller
 
     public function edit(User $user): View
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $this->ensureStaffUser($user);
         $user->load('department');
 
@@ -137,6 +142,8 @@ class AdminUserManagementController extends Controller
 
     public function forceTimeOut(User $user): RedirectResponse
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $this->ensureStaffUser($user);
 
         $attendance = $this->closeOpenAttendance($user);
@@ -153,8 +160,7 @@ class AdminUserManagementController extends Controller
             ->update(['time_out' => now()]);
 
         if ($updated > 0) {
-            SpecialSchedule::query()
-                ->where('user_id', $user->id)
+            $user->specialSchedules()
                 ->whereIn('type', ['On Break', 'Not Available'])
                 ->where('start_datetime', '<=', now())
                 ->where('end_datetime', '>=', now())

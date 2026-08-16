@@ -8,6 +8,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -347,12 +348,17 @@ class User extends Authenticatable
             ->first();
     }
 
-    public function statusOverrides()
+    public function statusOverrides(): HasMany
     {
         return $this->hasMany(StatusOverride::class);
     }
 
-    public function specialSchedules()
+    public function statusOverridesSet(): HasMany
+    {
+        return $this->hasMany(StatusOverride::class, 'set_by_admin_id');
+    }
+
+    public function specialSchedules(): HasMany
     {
         return $this->hasMany(SpecialSchedule::class);
     }
@@ -365,6 +371,18 @@ class User extends Authenticatable
     public function attendanceRecords(): HasMany
     {
         return $this->hasMany(AttendanceRecord::class);
+    }
+
+    public function activeAttendanceRecord(): HasOne
+    {
+        return $this->hasOne(AttendanceRecord::class)
+            ->whereNull('time_out')
+            ->latestOfMany('time_in');
+    }
+
+    public function forcedAttendanceRecords(): HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class, 'forced_time_out_by');
     }
 
     public function currentAttendance(?Carbon $moment = null): ?AttendanceRecord
@@ -394,6 +412,16 @@ class User extends Authenticatable
     public function suspendedBy(): BelongsTo
     {
         return $this->belongsTo(self::class, 'suspended_by');
+    }
+
+    public function suspendedUsers(): HasMany
+    {
+        return $this->hasMany(self::class, 'suspended_by');
+    }
+
+    public function reviewedStudentRegistrations(): HasMany
+    {
+        return $this->hasMany(PendingStudentRegistration::class, 'reviewed_by');
     }
 
     /** @use HasFactory<UserFactory> */

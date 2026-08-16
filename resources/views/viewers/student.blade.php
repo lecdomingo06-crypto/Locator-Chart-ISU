@@ -46,7 +46,7 @@
 
         .student-workspace {
             display: grid;
-            grid-template-columns: 228px minmax(0, 1fr);
+            grid-template-columns: var(--shell-sidebar-width, 268px) minmax(0, 1fr);
             min-height: 100vh;
         }
 
@@ -661,6 +661,104 @@
             font-weight: 600;
         }
 
+        .detail-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 40px;
+            padding: 10px 14px;
+            border: 1px solid rgba(20, 114, 71, 0.16);
+            border-radius: 14px;
+            background: var(--green-100);
+            color: var(--green-900);
+            font: inherit;
+            font-size: 0.86rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .detail-button:hover {
+            border-color: rgba(20, 114, 71, 0.28);
+            background: #d7f3e2;
+            transform: translateY(-1px);
+        }
+
+        .detail-button + .class-card {
+            display: none;
+        }
+
+        .detail-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(10, 41, 27, 0.46);
+            backdrop-filter: blur(6px);
+        }
+
+        .detail-modal.is-open {
+            display: flex;
+        }
+
+        .detail-dialog {
+            width: min(520px, 100%);
+            max-height: calc(100vh - 48px);
+            overflow: auto;
+            border: 1px solid rgba(20, 114, 71, 0.18);
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(12, 70, 45, 0.26);
+        }
+
+        .detail-dialog-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 22px;
+            border-bottom: 1px solid rgba(20, 114, 71, 0.12);
+        }
+
+        .detail-dialog-title span {
+            color: var(--green-900);
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .detail-dialog-title h3 {
+            margin: 4px 0 0;
+            font-size: 1.3rem;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+        }
+
+        .detail-close {
+            width: 38px;
+            height: 38px;
+            border: 1px solid rgba(20, 114, 71, 0.14);
+            border-radius: 12px;
+            background: var(--green-100);
+            color: var(--green-900);
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .detail-dialog-body {
+            padding: 20px 22px 22px;
+        }
+
+        body.has-detail-modal {
+            overflow: hidden;
+        }
+
         .legacy-hidden {
             display: none;
         }
@@ -1036,6 +1134,9 @@
                                 </div>
                             </div>
                         @elseif($status === 'In Class')
+                            <button type="button" class="detail-button" data-detail-open="detail-modal-{{ $user->id }}">
+                                View class details
+                            </button>
                             <div class="class-card">
                                 <strong>Current Class Details</strong>
                                 <div class="class-details">
@@ -1061,6 +1162,41 @@
                             </div>
                         @endif
                     </article>
+
+                    @if($status === 'In Class')
+                        <div id="detail-modal-{{ $user->id }}" class="detail-modal" aria-hidden="true">
+                            <div class="detail-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title-{{ $user->id }}">
+                                <div class="detail-dialog-head">
+                                    <div class="detail-dialog-title">
+                                        <span>{{ $user->full_name }}</span>
+                                        <h3 id="detail-title-{{ $user->id }}">Current Class Details</h3>
+                                    </div>
+                                    <button type="button" class="detail-close" data-detail-close aria-label="Close details">x</button>
+                                </div>
+                                <div class="detail-dialog-body">
+                                    <div class="class-card">
+                                        <strong>Class Details</strong>
+                                        <div class="class-details">
+                                            <div class="class-line">
+                                                <span>Subject</span>
+                                                <div>{{ $statusData['subject'] }}</div>
+                                            </div>
+                                            <div class="class-line">
+                                                <span>Room</span>
+                                                <div>{{ $statusData['room'] }}</div>
+                                            </div>
+                                            @if(!empty($statusData['class_start_time']) && !empty($statusData['class_end_time']))
+                                                <div class="class-line">
+                                                    <span>Time</span>
+                                                    <div>{{ \Carbon\Carbon::createFromFormat('H:i:s', $statusData['class_start_time'])->format('g:i A') }} - {{ \Carbon\Carbon::createFromFormat('H:i:s', $statusData['class_end_time'])->format('g:i A') }}</div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 @empty
                     <section class="empty-state">
                         <h2>No professors or faculty found.</h2>
@@ -1081,6 +1217,42 @@
 
     setInterval(updateClock, 1000);
     updateClock();
+
+    document.querySelectorAll('[data-detail-open]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const modal = document.getElementById(button.dataset.detailOpen);
+
+            if (!modal) {
+                return;
+            }
+
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('has-detail-modal');
+        });
+    });
+
+    function closeDetailModal(modal) {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('has-detail-modal');
+    }
+
+    document.querySelectorAll('.detail-modal').forEach(function (modal) {
+        modal.addEventListener('click', function (event) {
+            if (event.target === modal || event.target.closest('[data-detail-close]')) {
+                closeDetailModal(modal);
+            }
+        });
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        document.querySelectorAll('.detail-modal.is-open').forEach(closeDetailModal);
+    });
     </script>
 </body>
 </html>

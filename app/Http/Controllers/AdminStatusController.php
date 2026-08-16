@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\StatusOverride;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AdminStatusController extends Controller
 {
@@ -23,18 +22,23 @@ class AdminStatusController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required',
+            'user_id' => [
+                'required',
+                'integer',
+                Rule::exists('users', 'id')->where(fn ($query) => $query
+                    ->whereIn('role', ['professor', 'faculty'])
+                    ->where('is_suspended', false)),
+            ],
             'status' => 'required|string',
             'start_datetime' => 'required|date',
             'end_datetime' => 'required|date|after:start_datetime',
         ]);
 
-        StatusOverride::create([
+        $request->user()->statusOverridesSet()->create([
             'user_id' => $request->user_id,
             'status' => $request->status,
             'start_datetime' => $request->start_datetime,
             'end_datetime' => $request->end_datetime,
-            'set_by_admin_id' => Auth::id(),
         ]);
 
         return back()->with('success', 'Status override applied.');

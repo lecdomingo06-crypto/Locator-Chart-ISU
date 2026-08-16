@@ -55,6 +55,7 @@
                     name="password"
                     required
                     autocomplete="current-password" />
+                <x-password-strength for="password" :suggest="false" />
                 <x-input-error :messages="$errors->get('password')" class="auth-error" />
             </div>
 

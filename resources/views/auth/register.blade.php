@@ -20,7 +20,7 @@
     </div>
 
     <div class="panel-body">
-        <form method="POST" action="{{ route('admin.users.store') }}">
+        <form method="POST" action="{{ route('admin.users.store') }}" autocomplete="on">
             @csrf
 
             <div class="form-grid">
@@ -34,7 +34,7 @@
 
                 <div class="field">
                     <label for="username">Username</label>
-                    <input id="username" type="text" name="username" value="{{ old('username') }}" required>
+                    <input id="username" type="text" name="username" value="{{ old('username') }}" required autocomplete="username">
                     @error('username')
                         <p class="field-error">{{ $message }}</p>
                     @enderror
@@ -69,7 +69,8 @@
 
                 <div class="field">
                     <label for="password">Password</label>
-                    <input id="password" type="password" name="password" required autocomplete="new-password">
+                    <input id="password" type="password" name="password" required autocomplete="new-password" autocapitalize="none" spellcheck="false">
+                    <x-password-strength for="password" confirmation="password_confirmation" />
                     @error('password')
                         <p class="field-error">{{ $message }}</p>
                     @enderror
@@ -77,7 +78,7 @@
 
                 <div class="field">
                     <label for="password_confirmation">Confirm Password</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
+                    <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" autocapitalize="none" spellcheck="false">
                     @error('password_confirmation')
                         <p class="field-error">{{ $message }}</p>
                     @enderror
