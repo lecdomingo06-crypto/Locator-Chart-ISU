@@ -52,7 +52,9 @@ class ScheduleController extends Controller
                 ->with('error', 'That schedule is not available for this account.');
         }
 
-        return view('schedules.edit', compact('schedule'));
+        return redirect()
+            ->route('schedules.create')
+            ->with('info', 'Open the schedule from the timetable to edit it in the popup.');
     }
 
     public function update(Request $request, Schedule $schedule)

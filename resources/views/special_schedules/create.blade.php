@@ -790,8 +790,6 @@
                     </div>
                 </div>
 
-                <p class="sidebar-note">Create temporary status updates and review your current viewer status.</p>
-
                 <span class="sidebar-section-label">Workspace</span>
                 <nav class="sidebar-nav" aria-label="{{ ucfirst($user->role) }} workspace">
                     <a href="{{ route('staff.viewer') }}" class="sidebar-link{{ request()->routeIs('staff.viewer') ? ' is-active' : '' }}">

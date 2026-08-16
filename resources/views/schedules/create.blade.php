@@ -606,7 +606,7 @@
         }
 
         .modal-dialog {
-            width: min(500px, 100%);
+            width: min(620px, 100%);
             overflow: hidden;
             border: 1px solid rgba(20, 114, 71, 0.14);
             border-radius: 20px;
@@ -664,6 +664,11 @@
             gap: 10px;
         }
 
+        [data-schedule-details] {
+            display: grid;
+            gap: 16px;
+        }
+
         .modal-detail {
             padding: 12px;
             border-radius: 14px;
@@ -683,6 +688,30 @@
         .modal-detail strong {
             display: block;
             margin-top: 6px;
+        }
+
+        .schedule-modal [hidden] {
+            display: none !important;
+        }
+
+        .modal-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .modal-form .field-grid {
+            gap: 12px;
+        }
+
+        .modal-form .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .modal-form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 2px;
         }
 
         .delete-form {
@@ -778,8 +807,92 @@
         }
     </style>
     <x-minimal-ui />
+    <style>
+        body.schedule-page .shell {
+            width: min(1440px, 100%) !important;
+            max-width: 1440px !important;
+        }
+
+        body.schedule-page .workspace-main .page {
+            padding: 48px 40px 36px !important;
+        }
+
+        body.schedule-page .content-grid {
+            grid-template-columns: minmax(340px, 390px) minmax(0, 1fr);
+            gap: 20px;
+        }
+
+        body.schedule-page .form-panel,
+        body.schedule-page .table-panel {
+            min-width: 0;
+        }
+
+        body.schedule-page .schedule-table-wrap {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            scrollbar-gutter: stable;
+        }
+
+        body.schedule-page .weekly-table {
+            width: 100%;
+            min-width: 980px;
+            table-layout: fixed;
+        }
+
+        body.schedule-page .weekly-table .time-col {
+            width: 112px;
+        }
+
+        body.schedule-page .weekly-table th:not(.time-col) {
+            width: 124px;
+        }
+
+        body.schedule-page .weekly-table th {
+            white-space: nowrap;
+        }
+
+        body.schedule-page .weekly-table td {
+            height: 82px;
+            padding: 10px;
+        }
+
+        body.schedule-page .schedule-chip {
+            min-height: 56px;
+            padding: 10px 12px;
+            align-content: start;
+        }
+
+        body.schedule-page .schedule-chip strong {
+            display: -webkit-box;
+            overflow: hidden;
+            font-size: 0.82rem;
+            line-height: 1.18;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        body.schedule-page .schedule-chip span {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 1380px) {
+            body.schedule-page .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body.schedule-page .workspace-main .page {
+                padding: 16px 14px 20px !important;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="schedule-page">
 @php
     $user = auth()->user();
     $displayName = $user->full_name ?: $user->username;
@@ -798,6 +911,7 @@
         fn ($schedule) => $schedule->start_time . '|' . $schedule->end_time . '|' . $schedule->day_of_week
     );
     $formatTime = fn ($time) => \Carbon\Carbon::parse($time)->format('g:i A');
+    $timeInput = fn ($time) => \Carbon\Carbon::parse($time)->format('H:i');
 @endphp
 
     <div class="workspace-shell">
@@ -825,8 +939,6 @@
                         <span>Schedule and profile tools</span>
                     </div>
                 </div>
-
-                <p class="sidebar-note">Create regular class schedules and review saved weekly entries.</p>
 
                 <span class="sidebar-section-label">Workspace</span>
                 <nav class="sidebar-nav" aria-label="Professor workspace">
@@ -1067,46 +1179,123 @@
             <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="schedule-title-{{ $schedule->id }}">
                 <div class="modal-head">
                     <div>
-                        <span>Schedule Details</span>
+                        <span data-schedule-modal-label>Schedule Details</span>
                         <h3 id="schedule-title-{{ $schedule->id }}">{{ $schedule->subject }}</h3>
                     </div>
                     <button type="button" class="modal-close" data-schedule-close aria-label="Close schedule details">x</button>
                 </div>
 
                 <div class="modal-body">
-                    <div class="modal-details">
-                        <div class="modal-detail">
-                            <span>Day</span>
-                            <strong>{{ $schedule->day_of_week }}</strong>
+                    <section data-schedule-details>
+                        <div class="modal-details">
+                            <div class="modal-detail">
+                                <span>Day</span>
+                                <strong>{{ $schedule->day_of_week }}</strong>
+                            </div>
+                            <div class="modal-detail">
+                                <span>Time</span>
+                                <strong>{{ $formatTime($schedule->start_time) }} - {{ $formatTime($schedule->end_time) }}</strong>
+                            </div>
+                            <div class="modal-detail">
+                                <span>Room</span>
+                                <strong>{{ $schedule->room }}</strong>
+                            </div>
+                            <div class="modal-detail">
+                                <span>Term</span>
+                                <strong>{{ $schedule->semester }} / {{ $schedule->school_year }}</strong>
+                            </div>
                         </div>
-                        <div class="modal-detail">
-                            <span>Time</span>
-                            <strong>{{ $formatTime($schedule->start_time) }} - {{ $formatTime($schedule->end_time) }}</strong>
-                        </div>
-                        <div class="modal-detail">
-                            <span>Room</span>
-                            <strong>{{ $schedule->room }}</strong>
-                        </div>
-                        <div class="modal-detail">
-                            <span>Term</span>
-                            <strong>{{ $schedule->semester }} / {{ $schedule->school_year }}</strong>
-                        </div>
-                    </div>
 
-                    <div class="modal-actions">
-                        <a href="{{ route('schedules.edit', $schedule) }}" class="primary-button">Edit Schedule</a>
-                        <form method="POST" action="{{ route('schedules.destroy.post', $schedule) }}" class="delete-form">
-                            @csrf
-                            <button type="submit" class="danger-button">Permanently Delete</button>
-                        </form>
-                        <button type="button" class="ghost-button" data-schedule-close>Cancel</button>
-                    </div>
+                        <div class="modal-actions">
+                            <button type="button" class="primary-button" data-schedule-edit>Edit Schedule</button>
+                            <form method="POST" action="{{ route('schedules.destroy.post', $schedule) }}" class="delete-form">
+                                @csrf
+                                <button type="submit" class="danger-button">Permanently Delete</button>
+                            </form>
+                            <button type="button" class="ghost-button" data-schedule-close>Cancel</button>
+                        </div>
+                    </section>
+
+                    <form method="POST" action="{{ route('schedules.update.post', $schedule) }}" class="modal-form" data-schedule-edit-form hidden>
+                        @csrf
+
+                        <div class="field-grid">
+                            <div class="field">
+                                <label for="modal-subject-{{ $schedule->id }}">Subject</label>
+                                <input id="modal-subject-{{ $schedule->id }}" type="text" name="subject" value="{{ $schedule->subject }}" placeholder="Enter subject">
+                            </div>
+
+                            <div class="field">
+                                <label for="modal-room-{{ $schedule->id }}">Room</label>
+                                <input id="modal-room-{{ $schedule->id }}" type="text" name="room" value="{{ $schedule->room }}" placeholder="Enter room">
+                            </div>
+
+                            <div class="field full">
+                                <label for="modal-day-{{ $schedule->id }}">Day</label>
+                                <select id="modal-day-{{ $schedule->id }}" name="day_of_week">
+                                    @foreach($days as $day)
+                                        <option value="{{ $day }}" {{ $schedule->day_of_week === $day ? 'selected' : '' }}>{{ $day }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="field">
+                                <label for="modal-start-{{ $schedule->id }}">Start</label>
+                                <input id="modal-start-{{ $schedule->id }}" type="time" name="start_time" value="{{ $timeInput($schedule->start_time) }}">
+                            </div>
+
+                            <div class="field">
+                                <label for="modal-end-{{ $schedule->id }}">End</label>
+                                <input id="modal-end-{{ $schedule->id }}" type="time" name="end_time" value="{{ $timeInput($schedule->end_time) }}">
+                            </div>
+
+                            <div class="field">
+                                <label for="modal-semester-{{ $schedule->id }}">Semester</label>
+                                <input id="modal-semester-{{ $schedule->id }}" type="text" name="semester" value="{{ $schedule->semester }}" placeholder="Enter semester">
+                            </div>
+
+                            <div class="field">
+                                <label for="modal-school-year-{{ $schedule->id }}">School Year</label>
+                                <input id="modal-school-year-{{ $schedule->id }}" type="text" name="school_year" value="{{ $schedule->school_year }}" placeholder="Enter school year">
+                            </div>
+                        </div>
+
+                        <div class="modal-form-actions">
+                            <button type="submit" class="primary-button">Save Changes</button>
+                            <button type="button" class="ghost-button" data-schedule-view>Back to Details</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     @endforeach
 
     <script>
+        function setScheduleModalMode(modal, mode) {
+            const details = modal.querySelector('[data-schedule-details]');
+            const form = modal.querySelector('[data-schedule-edit-form]');
+            const label = modal.querySelector('[data-schedule-modal-label]');
+
+            if (!details || !form) {
+                return;
+            }
+
+            const isEditing = mode === 'edit';
+            details.hidden = isEditing;
+            form.hidden = !isEditing;
+
+            if (label) {
+                label.textContent = isEditing ? 'Edit Schedule' : 'Schedule Details';
+            }
+
+            if (isEditing) {
+                const firstField = form.querySelector('input, select');
+                if (firstField) {
+                    firstField.focus();
+                }
+            }
+        }
+
         document.querySelectorAll('[data-schedule-open]').forEach(function (button) {
             button.addEventListener('click', function () {
                 const modal = document.getElementById(button.dataset.scheduleOpen);
@@ -1115,6 +1304,7 @@
                     return;
                 }
 
+                setScheduleModalMode(modal, 'details');
                 modal.classList.add('is-open');
                 modal.setAttribute('aria-hidden', 'false');
             });
@@ -1123,12 +1313,21 @@
         function closeScheduleModal(modal) {
             modal.classList.remove('is-open');
             modal.setAttribute('aria-hidden', 'true');
+            setScheduleModalMode(modal, 'details');
         }
 
         document.querySelectorAll('.schedule-modal').forEach(function (modal) {
             modal.addEventListener('click', function (event) {
                 if (event.target === modal || event.target.closest('[data-schedule-close]')) {
                     closeScheduleModal(modal);
+                }
+
+                if (event.target.closest('[data-schedule-edit]')) {
+                    setScheduleModalMode(modal, 'edit');
+                }
+
+                if (event.target.closest('[data-schedule-view]')) {
+                    setScheduleModalMode(modal, 'details');
                 }
             });
         });

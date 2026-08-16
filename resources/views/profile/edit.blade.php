@@ -686,8 +686,221 @@
         }
     </style>
     <x-minimal-ui />
+    <style>
+        body.profile-page .profile-main {
+            min-height: 100vh;
+            padding: clamp(28px, 5vw, 64px) 24px 48px !important;
+            align-content: start;
+        }
+
+        body.profile-page .edit-heading {
+            width: min(620px, 100%);
+            margin-bottom: 12px;
+            color: var(--text);
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        body.profile-page .edit-heading::before {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+        }
+
+        body.profile-page .profile-editor {
+            width: min(620px, 100%) !important;
+            padding: 34px 38px !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+            box-shadow: 0 18px 44px rgba(12, 92, 56, 0.08) !important;
+        }
+
+        body.profile-page .profile-editor::before {
+            display: none;
+        }
+
+        body.profile-page .profile-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        body.profile-page .photo-column {
+            justify-items: center;
+            gap: 10px;
+        }
+
+        body.profile-page .photo-card {
+            width: 104px;
+            height: 104px;
+            aspect-ratio: 1;
+            border: 1px solid var(--line);
+            border-radius: 999px !important;
+            background: #f7fbf8;
+            box-shadow: 0 10px 24px rgba(12, 92, 56, 0.08);
+        }
+
+        body.profile-page .photo-card img {
+            border-radius: inherit;
+        }
+
+        body.profile-page .photo-placeholder {
+            border-radius: inherit;
+            color: var(--accent-dark);
+            background: var(--accent-soft);
+            font-size: 2.5rem;
+        }
+
+        body.profile-page .camera-icon {
+            inset: auto 0 4px auto;
+            width: 28px;
+            height: 28px;
+            color: #ffffff;
+            background: var(--accent);
+            border: 2px solid #ffffff;
+            box-shadow: 0 8px 18px rgba(12, 92, 56, 0.18);
+        }
+
+        body.profile-page .upload-row {
+            display: none;
+        }
+
+        body.profile-page .alert-error {
+            width: 100%;
+        }
+
+        body.profile-page .details-column {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px 16px;
+            padding-top: 0;
+        }
+
+        body.profile-page .field-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 7px;
+            align-items: stretch;
+        }
+
+        body.profile-page .field-row.is-wide,
+        body.profile-page .form-actions {
+            grid-column: 1 / -1;
+        }
+
+        body.profile-page .field-row label,
+        body.profile-page .password-field label {
+            color: var(--green-900);
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: none;
+        }
+
+        body.profile-page .field-row input,
+        body.profile-page .password-field input {
+            min-height: 46px;
+            padding: 0 14px;
+            border: 1px solid #d7e7dd;
+            border-radius: 7px;
+            color: var(--text);
+            background: #ffffff;
+            font-size: 0.92rem;
+        }
+
+        body.profile-page .field-row input[readonly] {
+            color: #496253;
+            background: #f5faf7;
+        }
+
+        body.profile-page .field-row input:not([readonly]):focus,
+        body.profile-page .password-field input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(20, 114, 71, 0.1);
+        }
+
+        body.profile-page .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            margin-top: 4px;
+            padding-left: 0;
+        }
+
+        body.profile-page .primary-button,
+        body.profile-page .secondary-link {
+            min-height: 44px;
+            min-width: 116px;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            letter-spacing: 0 !important;
+            text-transform: none;
+        }
+
+        body.profile-page .primary-button:hover,
+        body.profile-page .secondary-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(12, 92, 56, 0.14);
+        }
+
+        body.profile-page .password-editor {
+            margin-top: 18px;
+            padding: 28px 38px !important;
+        }
+
+        body.profile-page .password-heading {
+            margin-bottom: 18px;
+        }
+
+        body.profile-page .password-heading h2 {
+            font-size: 1.2rem;
+        }
+
+        body.profile-page .password-heading p {
+            max-width: 48ch;
+        }
+
+        body.profile-page .password-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        body.profile-page .password-actions {
+            justify-content: flex-start;
+        }
+
+        body.profile-page .password-actions .primary-button {
+            min-width: 150px;
+        }
+
+        @media (max-width: 720px) {
+            body.profile-page .profile-main {
+                padding: 22px 14px 28px !important;
+            }
+
+            body.profile-page .profile-editor {
+                padding: 24px 18px !important;
+            }
+
+            body.profile-page .details-column {
+                grid-template-columns: 1fr;
+            }
+
+            body.profile-page .form-actions,
+            body.profile-page .password-actions {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            body.profile-page .primary-button,
+            body.profile-page .secondary-link {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="profile-page">
 @php
     $displayName = $user->full_name ?: $user->username;
     $departmentName = $user->department->name ?? 'No department assigned';
@@ -723,8 +936,6 @@
                         <span>Profile and schedule tools</span>
                     </div>
                 </div>
-
-                <p class="sidebar-note">Monitor availability and manage your profile tools.</p>
 
                 <span class="sidebar-section-label">Workspace</span>
                 <nav class="sidebar-nav" aria-label="{{ ucfirst($user->role) }} workspace">
@@ -871,23 +1082,6 @@
                         </div>
 
                         <div class="field-row">
-                            <label for="profile_role">Role</label>
-                            <input id="profile_role" type="text" value="{{ ucfirst($user->role) }}" readonly>
-                        </div>
-
-                        @if($user->role === 'student' && $user->student_id)
-                            <div class="field-row">
-                                <label for="profile_student_id">Student ID</label>
-                                <input id="profile_student_id" type="text" value="{{ $user->student_id }}" readonly>
-                            </div>
-                        @endif
-
-                        <div class="field-row">
-                            <label for="profile_department">Department</label>
-                            <input id="profile_department" type="text" value="{{ $departmentName }}" readonly>
-                        </div>
-
-                        <div class="field-row">
                             <label for="profile_username">Username</label>
                             <div class="field-control">
                                 <input id="profile_username" name="username" type="text" value="{{ old('username', $user->username) }}" autocomplete="username" required>
@@ -897,7 +1091,7 @@
                             </div>
                         </div>
 
-                        <div class="field-row">
+                        <div class="field-row is-wide">
                             <label for="profile_email">Email</label>
                             <div class="field-control">
                                 <input id="profile_email" name="email" type="email" value="{{ old('email', $user->email) }}" autocomplete="email" required>
@@ -908,9 +1102,21 @@
                         </div>
 
                         <div class="field-row">
-                            <label for="profile_status">Status</label>
-                            <input id="profile_status" type="text" value="{{ $status }}" readonly>
+                            <label for="profile_role">Role</label>
+                            <input id="profile_role" type="text" value="{{ ucfirst($user->role) }}" readonly>
                         </div>
+
+                        <div class="field-row">
+                            <label for="profile_department">Department</label>
+                            <input id="profile_department" type="text" value="{{ $departmentName }}" readonly>
+                        </div>
+
+                        @if($user->role === 'student' && $user->student_id)
+                            <div class="field-row">
+                                <label for="profile_student_id">Student ID</label>
+                                <input id="profile_student_id" type="text" value="{{ $user->student_id }}" readonly>
+                            </div>
+                        @endif
 
                         <div class="form-actions">
                             <button type="submit" class="primary-button">Save Changes</button>
@@ -927,14 +1133,15 @@
                     <p>Enter your current password before choosing a new password for your account.</p>
                 </div>
 
-                <form method="POST" action="{{ route('password.update') }}" class="password-form">
+                <form method="POST" action="{{ route('password.update') }}" class="password-form" autocomplete="on">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="username" value="{{ $user->username ?? $user->email }}" autocomplete="username">
 
                     <div class="password-grid">
                         <div class="password-field">
                             <label for="current_password">Current Password</label>
-                            <input id="current_password" name="current_password" type="password" autocomplete="current-password" required>
+                            <input id="current_password" name="current_password" type="password" autocomplete="current-password" required autocapitalize="none" spellcheck="false">
                             @error('current_password', 'updatePassword')
                                 <p class="password-error">{{ $message }}</p>
                             @enderror
@@ -942,7 +1149,8 @@
 
                         <div class="password-field">
                             <label for="new_password">New Password</label>
-                            <input id="new_password" name="password" type="password" autocomplete="new-password" required>
+                            <input id="new_password" name="password" type="password" autocomplete="new-password" required autocapitalize="none" spellcheck="false">
+                            <x-password-strength for="new_password" confirmation="new_password_confirmation" />
                             @error('password', 'updatePassword')
                                 <p class="password-error">{{ $message }}</p>
                             @enderror
@@ -950,7 +1158,7 @@
 
                         <div class="password-field">
                             <label for="new_password_confirmation">Confirm New Password</label>
-                            <input id="new_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+                            <input id="new_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required autocapitalize="none" spellcheck="false">
                             @error('password_confirmation', 'updatePassword')
                                 <p class="password-error">{{ $message }}</p>
                             @enderror

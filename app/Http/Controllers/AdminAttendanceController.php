@@ -22,6 +22,8 @@ class AdminAttendanceController extends Controller
 
     public function index(Request $request): View
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $filters = $request->validate([
             'period' => ['nullable', Rule::in(['daily', 'weekly', 'monthly'])],
             'date' => ['nullable', 'date'],
@@ -30,7 +32,7 @@ class AdminAttendanceController extends Controller
             'q' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $period = $filters['period'] ?? 'daily';
+        $period = $filters['period'] ?? (isset($filters['date']) ? 'daily' : 'monthly');
         $anchor = Carbon::parse($filters['date'] ?? now())->startOfDay();
         [$rangeStart, $rangeEnd] = $this->reportRange($period, $anchor);
         $now = now();
@@ -154,6 +156,8 @@ class AdminAttendanceController extends Controller
 
     public function printable(Request $request): View
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $filters = $request->validate([
             'user_id' => [
                 'required',
@@ -238,6 +242,8 @@ class AdminAttendanceController extends Controller
 
     public function forceTimeOut(Request $request, User $user): RedirectResponse
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         abort_unless(in_array($user->role, self::STAFF_ROLES, true), 404);
 
         $validated = $request->validate([

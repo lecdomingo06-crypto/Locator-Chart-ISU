@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Models\Department;
 use App\Models\SpecialSchedule;
 use App\Models\User;
@@ -20,6 +21,8 @@ class AdminUserManagementController extends Controller
 
     public function index(Request $request): View
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
             'role' => ['nullable', Rule::in(self::STAFF_ROLES)],
@@ -53,6 +56,8 @@ class AdminUserManagementController extends Controller
 
     public function edit(User $user): View
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $this->ensureStaffUser($user);
         $user->load('department');
 
@@ -137,6 +142,8 @@ class AdminUserManagementController extends Controller
 
     public function forceTimeOut(User $user): RedirectResponse
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $this->ensureStaffUser($user);
 
         $attendance = $this->closeOpenAttendance($user);

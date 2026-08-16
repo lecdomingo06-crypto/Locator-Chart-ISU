@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Services\AttendanceCalendarService;
 use App\Services\AttendanceGeofenceService;
 use Carbon\Carbon;
@@ -20,6 +21,8 @@ class AttendanceController extends Controller
 
     public function show(Request $request): View
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $user = $request->user();
         $activeAttendance = $user->currentAttendance();
         $calendarMonth = Carbon::parse($request->query('month', now()->format('Y-m-01')))->startOfMonth();
@@ -39,10 +42,14 @@ class AttendanceController extends Controller
                     ->where('end_datetime', '>=', $calendarStart);
             },
         ]);
+        $clearedSessionIds = collect($request->session()->get($this->clearedSessionsKey($user->id), []))
+            ->map(fn ($id) => (int) $id);
         $todayAttendances = $user->attendanceRecords()
             ->whereDate('time_in', today())
             ->latest('time_in')
-            ->get();
+            ->get()
+            ->reject(fn ($attendance) => $attendance->time_out && $clearedSessionIds->contains((int) $attendance->id))
+            ->values();
         $calendarRecords = $user->attendanceRecords()
             ->whereBetween('time_in', [$calendarStart, $calendarEnd->copy()->endOfDay()])
             ->orderBy('time_in')
@@ -71,6 +78,8 @@ class AttendanceController extends Controller
 
     public function timeIn(Request $request): RedirectResponse
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $validated = $request->validate([
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
@@ -123,6 +132,8 @@ class AttendanceController extends Controller
 
     public function timeOut(Request $request): RedirectResponse
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $user = $request->user();
 
         $attendance = DB::transaction(function () use ($user) {
@@ -160,16 +171,33 @@ class AttendanceController extends Controller
 
     public function clearSessions(Request $request): RedirectResponse
     {
-        $deleted = $request->user()
+        $user = $request->user();
+        $sessionKey = $this->clearedSessionsKey($user->id);
+        $alreadyClearedIds = collect($request->session()->get($sessionKey, []))
+            ->map(fn ($id) => (int) $id)
+            ->all();
+        $clearedIds = $user
             ->attendanceRecords()
             ->whereDate('time_in', today())
             ->whereNotNull('time_out')
-            ->delete();
+            ->whereNotIn('id', $alreadyClearedIds)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if ($clearedIds !== []) {
+            $request->session()->put($sessionKey, array_values(array_unique([...$alreadyClearedIds, ...$clearedIds])));
+        }
 
         return redirect()
             ->route('attendance.show')
-            ->with($deleted > 0 ? 'success' : 'error', $deleted > 0
-                ? 'Completed attendance sessions for today were cleared.'
-                : 'There are no completed sessions to clear.');
+            ->with($clearedIds !== [] ? 'success' : 'error', $clearedIds !== []
+                ? 'Completed sessions were hidden from today\'s log. Attendance records remain saved.'
+                : 'There are no visible completed sessions to hide.');
+    }
+
+    private function clearedSessionsKey(int $userId, ?Carbon $date = null): string
+    {
+        return sprintf('attendance.cleared_sessions.%d.%s', $userId, ($date ?? today())->toDateString());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Models\SpecialSchedule;
 use App\Models\User;
 use Carbon\Carbon;
@@ -16,6 +17,8 @@ class AvailabilityController extends Controller
 
     public function show(Request $request)
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $user = $request->user();
         $activeAvailability = $this->activeAvailabilitySchedule($user);
 
@@ -56,6 +59,8 @@ class AvailabilityController extends Controller
 
     private function startAvailability(Request $request, string $type, string $message)
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $user = $request->user();
 
         if (! $user->isTimedIn()) {

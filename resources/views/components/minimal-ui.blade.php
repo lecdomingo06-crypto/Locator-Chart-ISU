@@ -97,16 +97,16 @@
     .admin-layout,
     .workspace-layout,
     .student-workspace {
-        grid-template-columns: 228px minmax(0, 1fr) !important;
+        grid-template-columns: var(--shell-sidebar-width, 268px) minmax(0, 1fr) !important;
         background: var(--minimal-page) !important;
     }
 
     .admin-sidebar,
     .workspace-sidebar,
     .student-sidebar {
-        width: 228px !important;
-        min-width: 228px !important;
-        padding: 22px 14px !important;
+        width: var(--shell-sidebar-width, 268px) !important;
+        min-width: var(--shell-sidebar-width, 268px) !important;
+        padding: 24px 18px !important;
         border-radius: 0 !important;
         border-right: 1px solid var(--minimal-border) !important;
         background: var(--minimal-surface) !important;
@@ -115,8 +115,8 @@
 
     .sidebar-brand,
     .student-sidebar-brand {
-        gap: 11px !important;
-        padding: 0 8px 18px !important;
+        gap: 12px !important;
+        padding: 0 4px 28px !important;
         border-bottom: 1px solid var(--minimal-border) !important;
     }
 
@@ -158,14 +158,14 @@
 
     .sidebar-nav,
     .student-nav {
-        gap: 5px !important;
+        gap: 10px !important;
     }
 
     .sidebar-link,
     .student-nav-link {
-        min-height: 42px !important;
-        padding: 0 12px !important;
-        border-radius: 8px !important;
+        min-height: 48px !important;
+        padding: 0 15px !important;
+        border-radius: 11px !important;
         color: var(--minimal-text) !important;
         background: transparent !important;
         font-size: 0.86rem !important;

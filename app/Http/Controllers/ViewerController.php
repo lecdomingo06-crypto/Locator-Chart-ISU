@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\AttendanceRecord;
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ViewerController extends Controller
 {
     public function studentViewer(Request $request)
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $search = $request->search;
         $department = $request->department;
 
@@ -31,6 +34,8 @@ class ViewerController extends Controller
 
     public function staffViewer(Request $request)
     {
+        AttendanceRecord::autoTimeOutExpiredOpenSessions();
+
         $search = $request->search;
         $department = $request->department;
 

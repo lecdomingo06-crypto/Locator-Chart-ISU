@@ -6,7 +6,7 @@
             <p class="auth-copy">Choose a secure new password to restore access to your professor tracking account.</p>
         </div>
 
-        <form method="POST" action="{{ route('password.store') }}" class="auth-form-grid">
+        <form method="POST" action="{{ route('password.store') }}" class="auth-form-grid" autocomplete="on">
             @csrf
 
             <input type="hidden" name="token" value="{{ $request->route('token') }}">
@@ -19,7 +19,8 @@
 
             <div class="auth-group">
                 <x-input-label for="password" :value="__('Password')" class="auth-label" />
-                <x-text-input id="password" class="auth-field" type="password" name="password" required autocomplete="new-password" />
+                <x-text-input id="password" class="auth-field" type="password" name="password" required autocomplete="new-password" autocapitalize="none" spellcheck="false" />
+                <x-password-strength for="password" confirmation="password_confirmation" />
                 <x-input-error :messages="$errors->get('password')" class="auth-error" />
             </div>
 
@@ -27,7 +28,7 @@
                 <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="auth-label" />
                 <x-text-input id="password_confirmation" class="auth-field"
                     type="password"
-                    name="password_confirmation" required autocomplete="new-password" />
+                    name="password_confirmation" required autocomplete="new-password" autocapitalize="none" spellcheck="false" />
                 <x-input-error :messages="$errors->get('password_confirmation')" class="auth-error" />
             </div>
 
